@@ -2,7 +2,7 @@
 
 This application is a simple Contact manager with Google Maps and Via CEP Api, built with Laravel, Vue.js and Tailwind. Enjoy it!
 
-Stacks: Laravel, PHP 8.3, Vue.js 3, Vite, Docker, Laravel Sail, Laravel Vapor, Redis, Mysql.
+Stacks: Laravel, PHP 8.3, Node 20, Vue.js 3, Vite, Docker, Laravel Sail, Laravel Vapor, Redis, Mysql.
 
 # Running
 
