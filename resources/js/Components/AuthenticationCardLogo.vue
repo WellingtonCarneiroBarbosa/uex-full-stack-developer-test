@@ -3,7 +3,7 @@ import { Link } from "@inertiajs/vue3";
 </script>
 
 <template>
-    <Link :href="'/'" style="color: rgb(255, 255, 255)">
+    <Link :href="'/'" class="dark:text-white text-black">
         <svg
             version="1.1"
             fill="currentColor"
