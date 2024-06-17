@@ -11,6 +11,7 @@
         style="enable-background: new 0 0 420 170.9"
         xml:space="preserve"
         alt="Logo-UEX.IO"
+        class="dark:text-white text-black"
     >
         <g>
             <path
