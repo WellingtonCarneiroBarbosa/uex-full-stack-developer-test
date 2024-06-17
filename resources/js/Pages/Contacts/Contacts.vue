@@ -10,6 +10,10 @@ import Form from "./Partials/Form.vue";
 import { useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 
+const props = defineProps({
+    contacts: Object,
+});
+
 const form = ref({
     form: useForm({
         name: "",
@@ -37,20 +41,8 @@ const resetFormComponent = () => {
 
 const selectedContact = ref(null);
 
-const contacts = ref([
-    {
-        id: 1,
-        name: "Wellington Barbosa",
-        email: "wellingtonbarbosa.dev@gmail.com",
-        phone: "41988425978",
-        picture: null,
-        full_address:
-            "Rua Senador Darci Ribeiro, 3745, Iná, São José dos Pinhais - 83065-480",
-    },
-]);
-
 const contactsFormatted = computed(() => {
-    return contacts.value.map((contact) => {
+    return props.contacts.data.map((contact) => {
         let phoneFormatter = new StringMask("(00) 0 0000-0000");
         return {
             ...contact,
@@ -135,7 +127,7 @@ const pageTranslations = (name = "", attributes = {}) => {
                                                 class="h-10 w-10 rounded-full object-cover"
                                                 :src="
                                                     contact.picture ??
-                                                    'https://ui-avatars.com/api/?name=wellington+barbosa'
+                                                    `https://ui-avatars.com/api/?name=${contact.name}`
                                                 "
                                                 alt="wellington barbosa"
                                             />
