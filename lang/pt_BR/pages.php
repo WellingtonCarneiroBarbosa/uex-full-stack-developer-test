@@ -92,4 +92,9 @@ return [
 
     ],
 
+    'contacts' => [
+        'title'       => 'Contatos',
+        'description' => 'Gerencie sua lista de contatos',
+    ],
+
 ];

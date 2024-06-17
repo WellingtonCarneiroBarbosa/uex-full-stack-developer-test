@@ -11,4 +11,10 @@ return [
     'confirm' => 'Confirmar',
     'cancel'  => 'Cancelar',
     'unknown' => 'Desconhecido',
+
+    'ui' => [
+        'app-nav' => [
+            'contacts' => 'Contatos',
+        ],
+    ],
 ];

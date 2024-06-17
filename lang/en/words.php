@@ -12,4 +12,10 @@ return [
     'cancel'  => 'Cancel',
     'unknown' => 'Unknown',
     'done'    => 'Feito',
+
+    'ui' => [
+        'app-nav' => [
+            'contacts' => 'Contacts',
+        ],
+    ],
 ];
