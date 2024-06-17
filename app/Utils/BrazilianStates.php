@@ -40,4 +40,9 @@ class BrazilianStates
 
         return isset($this->states[$initials]) ? $this->states[$initials] : null;
     }
+
+    public function getStateInitials()
+    {
+        return array_keys($this->states);
+    }
 }

@@ -27,3 +27,16 @@ if (!function_exists('format')) {
         return $formattedString;
     }
 }
+
+if (!function_exists('extractDigitsRegex')) {
+    /**
+     * Removes non numeric characters from a given string
+     *
+     * @param string $string
+     * @return string
+     */
+    function extractDigitsRegex(string $string): string
+    {
+        return preg_replace('/[^0-9]/', '', $string);
+    }
+}

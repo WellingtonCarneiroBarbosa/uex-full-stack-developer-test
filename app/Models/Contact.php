@@ -31,7 +31,7 @@ use Illuminate\Database\Eloquent\Relations\BelongsTo;
  * @property int $user_id
  * @property \Illuminate\Support\Carbon|null $created_at
  * @property \Illuminate\Support\Carbon|null $updated_at
- * @property-read string $address_state_name
+ * @property-read string|null $address_state_name
  * @property-read mixed $full_address
  * @property-read \App\Models\User $user
  * @method static \Database\Factories\ContactFactory factory($count = null, $state = [])
@@ -86,7 +86,7 @@ class Contact extends Model
         static::addGlobalScope(new UserScope());
     }
 
-    public function getAddressStateNameAttribute(): string
+    public function getAddressStateNameAttribute(): ?string
     {
         return (new BrazilianStates())->getStateName($this->address_uf);
     }

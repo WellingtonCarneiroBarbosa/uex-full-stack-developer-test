@@ -126,6 +126,7 @@ return [
     'prohibited_unless'    => 'O campo :attribute é proibido exceto quando :other for :values.',
     'prohibits'            => 'O campo :attribute proíbe :other de estar presente.',
     'same'                 => 'Os campos :attribute e :other devem corresponder.',
+    'cpf'                  => 'O CPF informado é inválido',
     'size'                 => [
         'numeric' => 'O campo :attribute deve ser :size.',
         'file'    => 'O campo :attribute deve ser :size kilobytes.',
@@ -228,6 +229,7 @@ return [
         'address_neighborhood'          => 'Bairro',
         'address_number'                => 'número',
         'address_complement'            => 'complemento',
+
     ],
 
 ];

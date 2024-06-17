@@ -24,6 +24,6 @@ class Digits implements CastsAttributes
      */
     public function set(Model $model, string $key, mixed $value, array $attributes): mixed
     {
-        return preg_replace('/\D/', '', $value);
+        return extractDigitsRegex($value);
     }
 }
