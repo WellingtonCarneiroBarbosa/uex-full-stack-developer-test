@@ -13,6 +13,7 @@ Requirements: Docker
 <li>On bash, run `./docker-setup.sh`</li>
 <li>On bash, run `./vendor/bin/sail up` (it may take a while the first time)</li>
 <li>Its alive! Go to [http://localhost](http://localhost) and see it🎉</li>
+<li>This docker compose comes with mailpit: a simple mailbox for development environment. You can see the app e-mails on [http://localhost:8025](http://localhost:8025)</li>
 </ol>
 
 # Running without Docker
