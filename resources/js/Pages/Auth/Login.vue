@@ -36,7 +36,7 @@ const pageTranslations = (name = "", attributes = {}) => {
 </script>
 
 <template>
-    <Head title="Log in" />
+    <Head :title="pageTranslations('title')" />
 
     <div>
         <AuthenticationCard>
