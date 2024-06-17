@@ -12,6 +12,7 @@ return [
     'cancel'  => 'Cancel',
     'unknown' => 'Unknown',
     'done'    => 'Feito',
+    'add'     => 'Add',
 
     'ui' => [
         'app-nav' => [

@@ -220,6 +220,13 @@ return [
         'category'              => 'categoria',
         'blood_type'            => 'tipo sanguíneo',
         'birth_date'            => 'data de nascimento',
+        'cpf'                   => 'CPF',
+        'cep'                   => 'CEP',
+        'state'                 => 'Estado',
+        'street'                => 'Rua',
+        'neighborhood'          => 'Bairro',
+        'number'                => 'número',
+        'complement'            => 'complemento',
     ],
 
 ];

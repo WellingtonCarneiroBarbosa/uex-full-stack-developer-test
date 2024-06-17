@@ -11,6 +11,7 @@ return [
     'confirm' => 'Confirmar',
     'cancel'  => 'Cancelar',
     'unknown' => 'Desconhecido',
+    'add'     => 'Adicionar',
 
     'ui' => [
         'app-nav' => [

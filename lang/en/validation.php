@@ -241,6 +241,13 @@ return [
         'category'              => 'category',
         'blood_type'            => 'blood type',
         'birth_date'            => 'birth date',
+        'cpf'                   => 'CPF',
+        'cep'                   => 'CEP',
+        'state'                 => 'state',
+        'street'                => 'rua',
+        'neighborhood'          => 'neighborhood',
+        'number'                => 'number',
+        'complement'            => 'complement',
     ],
 
 ];

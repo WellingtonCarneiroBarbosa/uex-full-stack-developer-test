@@ -1,11 +1,39 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import Welcome from "@/Components/Welcome.vue";
 import { ucfirst } from "@/Helpers/functions";
 import { trans } from "laravel-vue-i18n";
-import { Dot } from "lucide-vue-next";
-import { computed, onMounted, ref } from "vue";
+import { Dot, Plus } from "lucide-vue-next";
+import { computed, ref } from "vue";
 import StringMask from "string-mask";
+import Modal from "@/Components/Modal.vue";
+import Form from "./Partials/Form.vue";
+import { useForm } from "@inertiajs/vue3";
+import PrimaryButton from "@/Components/PrimaryButton.vue";
+
+const form = ref({
+    form: useForm({
+        name: "",
+        email: "",
+        phone: "",
+        document: "",
+
+        address_cep: "",
+        address_state: "",
+        address_city: "",
+        address_neighborhood: "",
+        address_street: "",
+        address_number: "",
+        address_complement: "",
+    }),
+    mode: "create",
+    show: false,
+});
+
+const resetFormComponent = () => {
+    form.value.show = false;
+    form.value.mode = "create";
+    form.value.form.reset();
+};
 
 const selectedContact = ref(null);
 
@@ -43,6 +71,17 @@ const pageTranslations = (name = "", attributes = {}) => {
 </script>
 
 <template>
+    <Modal
+        max-width="4xl"
+        :show="form.show"
+        :closeable="true"
+        @close="resetFormComponent()"
+    >
+        <div class="p-4">
+            <Form @cancel="resetFormComponent()" :form="form.form" />
+        </div>
+    </Modal>
+
     <AppLayout :title="pageTranslations('title')">
         <template #header>
             <h2
@@ -58,6 +97,11 @@ const pageTranslations = (name = "", attributes = {}) => {
 
         <div class="py-12">
             <div class="max-w-7xl mx-auto sm:px-6 lg:px-8">
+                <div class="flex justify-end mb-4">
+                    <PrimaryButton @click="form.show = !form.show">{{
+                        $t("words.add")
+                    }}</PrimaryButton>
+                </div>
                 <div
                     class="bg-white dark:bg-gray-800 p-4 overflow-hidden shadow-xl sm:rounded-lg"
                 >
@@ -65,7 +109,7 @@ const pageTranslations = (name = "", attributes = {}) => {
                         <div
                             class="col-span-12 lg:col-span-4 pb-2 lg:pr-2 lg:pb-0"
                         >
-                            <div class="flex w-full">Actions</div>
+                            <div class="flex flex-row w-full">Filters</div>
                             <div class="flex pt-10 pb-24 overflow-x-auto">
                                 <div
                                     class="flex flex-row items-center gap-4"
