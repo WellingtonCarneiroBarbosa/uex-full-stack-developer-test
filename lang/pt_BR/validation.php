@@ -197,6 +197,7 @@ return [
         'neighborhood'          => 'bairro',
         'number'                => 'número',
         'password'              => 'senha',
+        'confirm-password'      => 'confirmar senha',
         'phone'                 => 'telefone',
         'second'                => 'segundo',
         'sex'                   => 'sexo',

@@ -192,6 +192,7 @@ return [
     'attributes' => [
         'email'                 => 'email',
         'password'              => 'password',
+        'confirm-password'      => 'confirm password',
         'address'               => 'address',
         'age'                   => 'age',
         'body'                  => 'body',
