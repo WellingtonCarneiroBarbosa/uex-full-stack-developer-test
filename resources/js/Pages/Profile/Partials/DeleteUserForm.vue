@@ -1,18 +1,24 @@
 <script setup>
-import { ref } from 'vue';
-import { useForm } from '@inertiajs/vue3';
-import ActionSection from '@/Components/ActionSection.vue';
-import DangerButton from '@/Components/DangerButton.vue';
-import DialogModal from '@/Components/DialogModal.vue';
-import InputError from '@/Components/InputError.vue';
-import SecondaryButton from '@/Components/SecondaryButton.vue';
-import TextInput from '@/Components/TextInput.vue';
+import { ref } from "vue";
+import { useForm } from "@inertiajs/vue3";
+import ActionSection from "@/Components/ActionSection.vue";
+import DangerButton from "@/Components/DangerButton.vue";
+import DialogModal from "@/Components/DialogModal.vue";
+import InputError from "@/Components/InputError.vue";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
+import TextInput from "@/Components/TextInput.vue";
+import { ucwords } from "@/Helpers/functions";
+import { trans } from "laravel-vue-i18n";
+
+const pageTranslations = (name = "", attributes = {}) => {
+    return trans(`pages.profile.delete-account.${name}`, attributes);
+};
 
 const confirmingUserDeletion = ref(false);
 const passwordInput = ref(null);
 
 const form = useForm({
-    password: '',
+    password: "",
 });
 
 const confirmUserDeletion = () => {
@@ -22,7 +28,7 @@ const confirmUserDeletion = () => {
 };
 
 const deleteUser = () => {
-    form.delete(route('current-user.destroy'), {
+    form.delete(route("current-user.destroy"), {
         preserveScroll: true,
         onSuccess: () => closeModal(),
         onError: () => passwordInput.value.focus(),
@@ -40,32 +46,32 @@ const closeModal = () => {
 <template>
     <ActionSection>
         <template #title>
-            Delete Account
+            {{ pageTranslations("title") }}
         </template>
 
         <template #description>
-            Permanently delete your account.
+            {{ pageTranslations("description") }}
         </template>
 
         <template #content>
             <div class="max-w-xl text-sm text-gray-600 dark:text-gray-400">
-                Once your account is deleted, all of its resources and data will be permanently deleted. Before deleting your account, please download any data or information that you wish to retain.
+                {{ pageTranslations("disclaimer") }}
             </div>
 
             <div class="mt-5">
                 <DangerButton @click="confirmUserDeletion">
-                    Delete Account
+                    {{ $t("words.delete") }}
                 </DangerButton>
             </div>
 
             <!-- Delete Account Confirmation Modal -->
             <DialogModal :show="confirmingUserDeletion" @close="closeModal">
                 <template #title>
-                    Delete Account
+                    {{ $t("words.delete") }}
                 </template>
 
                 <template #content>
-                    Are you sure you want to delete your account? Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account.
+                    {{ pageTranslations("are-you-sure") }}
 
                     <div class="mt-4">
                         <TextInput
@@ -73,18 +79,23 @@ const closeModal = () => {
                             v-model="form.password"
                             type="password"
                             class="mt-1 block w-3/4"
-                            placeholder="Password"
+                            :placeholder="
+                                ucwords($t('validation.attributes.password'))
+                            "
                             autocomplete="current-password"
                             @keyup.enter="deleteUser"
                         />
 
-                        <InputError :message="form.errors.password" class="mt-2" />
+                        <InputError
+                            :message="form.errors.password"
+                            class="mt-2"
+                        />
                     </div>
                 </template>
 
                 <template #footer>
                     <SecondaryButton @click="closeModal">
-                        Cancel
+                        {{ $t("words.cancel") }}
                     </SecondaryButton>
 
                     <DangerButton
@@ -93,7 +104,7 @@ const closeModal = () => {
                         :disabled="form.processing"
                         @click="deleteUser"
                     >
-                        Delete Account
+                        {{ $t("words.delete") }}
                     </DangerButton>
                 </template>
             </DialogModal>
