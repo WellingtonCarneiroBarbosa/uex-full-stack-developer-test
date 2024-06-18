@@ -3,7 +3,7 @@ import AppLayout from "@/Layouts/AppLayout.vue";
 import { ucfirst } from "@/Helpers/functions";
 import { trans } from "laravel-vue-i18n";
 import { Dot, Plus } from "lucide-vue-next";
-import { computed, ref } from "vue";
+import { computed, onMounted, ref } from "vue";
 import StringMask from "string-mask";
 import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
@@ -14,21 +14,29 @@ const props = defineProps({
     contacts: Object,
 });
 
-const form = ref({
-    form: useForm({
-        name: "",
-        email: "",
-        phone: "",
-        document: "",
+const formData = useForm({
+    name: "",
+    email: "",
+    phone: "",
+    cpf: "",
 
-        address_cep: "",
-        address_state: "",
-        address_city: "",
-        address_neighborhood: "",
-        address_street: "",
-        address_number: "",
-        address_complement: "",
-    }),
+    address_cep: "",
+    address_uf: "",
+    address_city: "",
+    address_neighborhood: "",
+    address_street: "",
+    address_number: "",
+    address_complement: "",
+
+    latitude: "",
+    longitude: "",
+});
+
+const map = ref(null);
+
+const markers = ref([]);
+
+const form = ref({
     mode: "create",
     show: false,
 });
@@ -36,10 +44,10 @@ const form = ref({
 const resetFormComponent = () => {
     form.value.show = false;
     form.value.mode = "create";
-    form.value.form.reset();
+    formData.reset();
 };
 
-const selectedContact = ref(null);
+const selectedContacts = ref([]);
 
 const contactsFormatted = computed(() => {
     return props.contacts.data.map((contact) => {
@@ -51,15 +59,80 @@ const contactsFormatted = computed(() => {
     });
 });
 
-const toggleContact = (contact) => {
-    selectedContact.value?.id === contact.id
-        ? (selectedContact.value = null)
-        : (selectedContact.value = contact);
+const pushContacts = (contact) => {
+    const index = selectedContacts.value.findIndex((c) => c.id === contact.id);
+
+    if (index !== -1) {
+        selectedContacts.value.splice(index, 1);
+
+        removeMarker(contact.id);
+    } else {
+        selectedContacts.value.push(contact);
+
+        addMarkerOnMap(
+            contact.id,
+            contact.name,
+            contact.latitude,
+            contact.longitude
+        );
+    }
 };
 
 const pageTranslations = (name = "", attributes = {}) => {
     return trans(`pages.contacts.${name}`, attributes);
 };
+
+const addMarkerOnMap = async (id, title, lat, lng) => {
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    const marker = new AdvancedMarkerElement({
+        map: window.map,
+        position: { lat: lat, lng: lng },
+        // title: title,
+    });
+
+    markers.value.push({
+        id: id,
+        marker: marker,
+    });
+
+    window.map.setCenter({ lat: lat, lng: lng });
+
+    window.map.setZoom(14);
+};
+
+const removeMarker = (id) => {
+    let marker = markers.value.find((marker) => marker.id === id);
+
+    if (marker) {
+        marker.marker.setMap(null);
+        markers.value = markers.value.filter((marker) => marker.id !== id);
+    }
+};
+
+onMounted(() => {
+    let customMap;
+
+    async function initMap() {
+        const position = { lat: -25.5, lng: -49.163 };
+
+        //@ts-ignore
+        const { Map } = await google.maps.importLibrary("maps");
+        const { AdvancedMarkerElement } = await google.maps.importLibrary(
+            "marker"
+        );
+
+        customMap = new Map(document.getElementById("map"), {
+            zoom: 6,
+            center: position,
+            mapId: "DEMO_MAP_ID",
+        });
+
+        window.map = customMap;
+    }
+
+    initMap();
+});
 </script>
 
 <template>
@@ -70,7 +143,7 @@ const pageTranslations = (name = "", attributes = {}) => {
         @close="resetFormComponent()"
     >
         <div class="p-4">
-            <Form @cancel="resetFormComponent()" :form="form.form" />
+            <Form @cancel="resetFormComponent()" :form="formData" />
         </div>
     </Modal>
 
@@ -102,24 +175,24 @@ const pageTranslations = (name = "", attributes = {}) => {
                             class="col-span-12 lg:col-span-4 pb-2 lg:pr-2 lg:pb-0"
                         >
                             <div class="flex flex-row w-full">Filters</div>
-                            <div class="flex pt-10 pb-24 overflow-x-auto">
-                                <div
-                                    class="flex flex-row items-center gap-4"
-                                    v-for="contact in contactsFormatted"
-                                    :key="contact.id"
-                                >
+                            <div
+                                class="flex pb-4 overflow-x-auto"
+                                v-for="contact in contactsFormatted"
+                                :key="contact.id"
+                            >
+                                <div class="flex flex-row items-center gap-4">
                                     <div>
                                         <input
-                                            id="check-contact"
+                                            :id="`check-contact-${contact.id}`"
                                             placeholder="check box"
                                             type="checkbox"
                                             class="checkbox rounded-md cursor-pointer h-4 w-4"
-                                            @change="toggleContact(contact)"
+                                            @change="pushContacts(contact)"
                                         />
                                     </div>
 
                                     <label
-                                        for="check-contact"
+                                        :for="`check-contact-${contact.id}`"
                                         class="cursor-pointer"
                                     >
                                         <div class="flex flex-row items-center">
@@ -189,8 +262,7 @@ const pageTranslations = (name = "", attributes = {}) => {
                         <div
                             class="col-span-12 lg:col-span-8 border-t pt-2 lg:border-l lg:pl-2 lg:pt-0 lg:border-t-0"
                         >
-                            Selected contact:
-                            {{ selectedContact?.name ?? "None" }}
+                            <div id="map"></div>
                         </div>
                     </div>
                     <!-- content-->
@@ -199,3 +271,10 @@ const pageTranslations = (name = "", attributes = {}) => {
         </div>
     </AppLayout>
 </template>
+
+<style>
+#map {
+    height: 400px; /* The height is 400 pixels */
+    width: 100%; /* The width is the width of the web page */
+}
+</style>

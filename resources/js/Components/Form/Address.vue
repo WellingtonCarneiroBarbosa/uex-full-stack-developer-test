@@ -3,10 +3,49 @@ import InputLabel from "@/Components/InputLabel.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import { ucfirst } from "@/Helpers/functions";
+import { nextTick, watch, reactive } from "vue";
+import { vMaska } from "maska";
 
 const props = defineProps({
     form: Object,
 });
+
+const cepMask = reactive({
+    mask: "##.###-###",
+    eager: true,
+});
+
+watch(
+    () => props.form.address_cep,
+    (cep) => {
+        cep = cep.replace(/\D/g, "");
+
+        if (cep.length === 8) {
+            props.form.processing = true;
+
+            window.axios
+                .get(route("dash.get-cep-address", { cep: cep }))
+                .then((response) => {
+                    let form = props.form;
+                    let data = response.data;
+
+                    form.address_uf = data.state;
+                    form.address_city = data.city;
+                    form.address_neighborhood = data.neighborhood;
+                    form.address_street = data.street;
+
+                    form.processing = false;
+
+                    nextTick(() => {
+                        document.getElementById("number")?.focus();
+                    });
+                });
+        }
+    },
+    {
+        immediate: true,
+    }
+);
 </script>
 
 <template>
@@ -21,6 +60,7 @@ const props = defineProps({
             v-model="form.address_cep"
             type="text"
             class="mt-1 block w-full"
+            v-maska:[cepMask]
         />
         <InputError :message="form.errors.address_cep" class="mt-2" />
     </div>

@@ -8,8 +8,12 @@ if (!function_exists('format')) {
      * @param string $pattern
      * @return string
      */
-    function format($string, $pattern)
+    function format(?string $string, string $pattern): string
     {
+        if (!$string) {
+            return '';
+        }
+
         $formattedString = '';
         $stringLength    = strlen($string);
         $patternLength   = strlen($pattern);
@@ -35,8 +39,12 @@ if (!function_exists('extractDigitsRegex')) {
      * @param string $string
      * @return string
      */
-    function extractDigitsRegex(string $string): string
+    function extractDigitsRegex(?string $string = ''): string
     {
+        if (!$string) {
+            return '';
+        }
+
         return preg_replace('/[^0-9]/', '', $string);
     }
 }

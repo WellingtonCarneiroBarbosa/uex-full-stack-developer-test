@@ -11,7 +11,7 @@ class IndexController extends Controller
     public function __invoke()
     {
         return Inertia::render('Contacts/Contacts', [
-            'contacts' => Contact::paginate(50),
+            'contacts' => Contact::orderBy('name', 'asc')->paginate(50),
         ]);
     }
 }

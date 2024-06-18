@@ -9,6 +9,9 @@ import SectionBorder from "@/Components/SectionBorder.vue";
 import Address from "@/Components/Form/Address.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
+import { vMaska } from "maska";
+import { reactive } from "vue";
+import { useToast } from "vue-toast-notification";
 
 const props = defineProps({
     form: Object,
@@ -16,6 +19,18 @@ const props = defineProps({
         type: String,
         default: "create",
     },
+});
+
+const cpfMask = reactive({
+    mask: "###.###.###-##",
+    eager: true,
+});
+
+const phoneNumberMask = reactive({
+    mask: (value) =>
+        value.length >= 14 || value.length == 11
+            ? "(##) # ####-####"
+            : "(##) ####-####",
 });
 
 const emit = defineEmits(["cancel", "submitted"]);
@@ -28,11 +43,67 @@ const pageTranslations = (name = "", attributes = {}) => {
     return trans(`pages.contacts.form.${props.mode}.${name}`, attributes);
 };
 
-const submit = () => {};
+const submit = () => {
+    if (props.mode === "create") {
+        create();
+    }
+
+    if (props.mode === "edit") {
+        //update();
+    }
+};
+
+const getCoordinates = () => {
+    return new Promise((resolve, reject) => {
+        let form = props.form;
+
+        if (
+            !form.address_uf ||
+            !form.address_city ||
+            !form.address_neighborhood ||
+            !form.address_street ||
+            !form.address_number
+        ) {
+            reject();
+            return;
+        }
+
+        window.axios
+            .get(
+                route("dash.get-coordinates", {
+                    address: `${form.address_street},${form.address_number},${form.address_neighborhood},${form.address_city},${form.address_uf}`,
+                })
+            )
+            .then((response) => {
+                resolve(response.data);
+            })
+            .catch((error) => {
+                reject(error);
+            });
+    });
+};
+
+const create = async () => {
+    props.form.clearErrors();
+
+    await getCoordinates()
+        .then(function (coordinates) {
+            props.form.latitude = coordinates.latitude;
+            props.form.longitude = coordinates.longitude;
+        })
+        .catch(() => {});
+
+    props.form.post(route("dash.contacts.store"), {
+        onSuccess: (response) => {
+            const $toast = useToast();
+            $toast.success(response.props.flash.message);
+        },
+    });
+};
 </script>
 
 <template>
-    <FormSection>
+    <FormSection @submitted="submit">
         <template #title>
             {{ pageTranslations("title", { name: form.name }) }}
         </template>
@@ -75,6 +146,7 @@ const submit = () => {};
                     v-model="form.cpf"
                     type="text"
                     class="mt-1 block w-full"
+                    v-maska:[cpfMask]
                 />
                 <InputError :message="form.errors.cpf" class="mt-2" />
             </div>
@@ -105,6 +177,7 @@ const submit = () => {};
                     v-model="form.phone"
                     type="text"
                     class="mt-1 block w-full"
+                    v-maska:[phoneNumberMask]
                 />
                 <InputError :message="form.errors.phone" class="mt-2" />
             </div>
@@ -121,10 +194,13 @@ const submit = () => {};
         </template>
 
         <template #actions>
-            <SecondaryButton @click="emit('cancel')" class="mr-2">{{
-                $t("words.cancel")
-            }}</SecondaryButton>
-            <PrimaryButton @click="submit">{{
+            <SecondaryButton
+                :disabled="form.processing"
+                @click="emit('cancel')"
+                class="mr-2"
+                >{{ $t("words.cancel") }}</SecondaryButton
+            >
+            <PrimaryButton :disabled="form.processing" type="submit">{{
                 $t("words.save")
             }}</PrimaryButton>
         </template>

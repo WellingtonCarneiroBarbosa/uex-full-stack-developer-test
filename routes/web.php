@@ -1,5 +1,7 @@
 <?php
 
+use App\Http\Controllers\API\GetCepAddressController;
+use App\Http\Controllers\API\GetCoordinatesFromAddressController;
 use Illuminate\Support\Facades\Route;
 use Inertia\Inertia;
 
@@ -19,6 +21,10 @@ Route::middleware([
     Route::get('/teste', function () {
         return Inertia::render('Test');
     })->name('test');
+
+    Route::get('/cep/{cep}', GetCepAddressController::class)->name('get-cep-address');
+
+    Route::get('/coordinates/{address}', GetCoordinatesFromAddressController::class)->name('get-coordinates');
 
     include_once __DIR__ . "/web/contacts.php";
 });
