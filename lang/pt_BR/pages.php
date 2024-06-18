@@ -23,6 +23,10 @@ return [
             'disclaimer' => 'Esqueceu sua senha? Sem problemas. Basta nos informar seu endereço de e-mail e enviaremos um link de redefinição de senha para que você possa escolher uma nova.',
             'send'       => 'Enviar link de redefinição',
         ],
+
+        'reset-password' => [
+            'title' => 'Resetar Senha',
+        ],
     ],
 
     'profile' => [
