@@ -92,4 +92,26 @@ return [
 
     ],
 
+    'contacts' => [
+        'title'       => 'Contatos',
+        'description' => 'Gerencie sua lista de contatos',
+
+        'form' => [
+            'common' => [
+                'contact-information' => 'Informações de Contato',
+                'address'             => 'Endereço',
+            ],
+
+            'create' => [
+                'title'       => 'Adicionar Contato',
+                'description' => 'Insira as informações do contato para cadastrá-lo',
+            ],
+
+            'edit' => [
+                'title'       => 'Editar Contato',
+                'description' => 'Atualize as informações do contato',
+            ],
+        ],
+    ],
+
 ];

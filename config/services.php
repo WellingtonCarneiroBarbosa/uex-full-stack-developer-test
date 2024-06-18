@@ -35,4 +35,17 @@ return [
         ],
     ],
 
+    'via-cep' => [
+        'base-url' => env('VIA_CEP_BASE_URL', 'https://viacep.com.br'),
+    ],
+
+    'brasil-api' => [
+        'base-url' => env('BRASIL_API_BASE_URL', 'https://brasilapi.com.br'),
+    ],
+
+    'google-geocoding-api' => [
+        'base-url' => env('MAPS_GEOCODING_API_BASE_URL', 'https://maps.googleapis.com'),
+        'token'    => env('MAPS_GEOCODING_API_KEY', ''),
+    ],
+
 ];
