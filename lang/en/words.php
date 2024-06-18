@@ -1,19 +1,21 @@
 <?php
 
 return [
-    'back'    => 'Back',
-    'enable'  => 'Enable',
-    'disable' => 'Disable',
-    'delete'  => 'Deletar',
-    'saving'  => 'Saving...',
-    'saved'   => 'Saved',
-    'save'    => 'Save',
-    'confirm' => 'Confirm',
-    'cancel'  => 'Cancel',
-    'unknown' => 'Unknown',
-    'done'    => 'Feito',
-    'add'     => 'Add',
-    'details' => 'Details',
+    'back'          => 'Back',
+    'enable'        => 'Enable',
+    'disable'       => 'Disable',
+    'delete'        => 'Delete',
+    'saving'        => 'Saving...',
+    'saved'         => 'Saved',
+    'save'          => 'Save',
+    'confirm'       => 'Confirm',
+    'cancel'        => 'Cancel',
+    'unknown'       => 'Unknown',
+    'add'           => 'Add',
+    'details'       => 'Details',
+    'edit'          => 'Edit',
+    'filter'        => 'Filter',
+    'clear-filters' => 'Clear Filters',
 
     'ui' => [
         'app-nav' => [
