@@ -11,7 +11,7 @@ import { reactive } from "vue";
 const props = defineProps({
     form: Object,
     filterMode: Boolean,
-    clearFilters: Object,
+    clearFilters: Function,
 });
 
 const cpfMask = reactive({
@@ -64,14 +64,14 @@ const filter = () => {
         <div class="col-span-6"></div>
 
         <div class="col-span-6 flex justify-end items-center gap-x-2">
-            <SecondaryButton v-if="filterMode" @click="clearFilters"
-                >Limpar filtros</SecondaryButton
-            >
+            <SecondaryButton v-if="filterMode" @click="clearFilters">{{
+                $t("words.clear-filters")
+            }}</SecondaryButton>
             <PrimaryButton
                 @click="filter"
                 :disabled="form.processing"
                 class="float-end"
-                >Filtrar</PrimaryButton
+                >{{ $t("words.filter") }}</PrimaryButton
             >
         </div>
     </div>

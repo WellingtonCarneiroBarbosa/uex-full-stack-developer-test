@@ -248,17 +248,20 @@ onUpdated(() => {
         :show="showConfirmDeleteDialog"
         @close="deleteContactDismissed"
     >
-        <template #title>Você tem certeza?</template>
-        <template #content
-            >O contato {{ selectedContact.name }} será permanentemente
-            excluído!</template
-        >
+        <template #title>{{
+            pageTranslations("confirm-deleting.title")
+        }}</template>
+        <template #content>{{
+            pageTranslations("confirm-deleting.description", {
+                name: selectedContact?.name ?? "",
+            })
+        }}</template>
 
         <template #footer>
             <PrimaryButton
                 id="confirm-contact-delete-button"
                 @click="confirmContactDeleting"
-                >Deletar</PrimaryButton
+                >{{ $t("words.delete") }}</PrimaryButton
             >
         </template>
     </ConfirmationModal>
@@ -295,6 +298,7 @@ onUpdated(() => {
                         >
                             <Filter
                                 :form="filterForm"
+                                :filter-mode="filterMode"
                                 :clear-filters="clearFilters"
                                 @filtered="filterMode = true"
                             />
@@ -321,15 +325,15 @@ onUpdated(() => {
                     <p v-if="contactsFormatted.length <= 0">
                         {{
                             filterMode
-                                ? "Nenhum contato encontrado."
-                                : "Você ainda não possui contatos. Adicione um para começar."
+                                ? pageTranslations("any-contacts-found")
+                                : pageTranslations("no-contacts")
                         }}
 
                         <span
                             class="cursor-pointer underline"
                             v-if="filterMode"
                             @click="clearFilters"
-                            >Limpar filtros</span
+                            >{{ $t("words.clear-filters") }}</span
                         >
                     </p>
 

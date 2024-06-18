@@ -96,6 +96,15 @@ return [
         'title'       => 'Contatos',
         'description' => 'Gerencie sua lista de contatos',
 
+        'no-contacts' => "Você ainda não possui contatos. Adicione um para começar",
+
+        'any-contacts-found' => "Nenhum contato encontrado",
+
+        'confirm-deleting' => [
+            'title'       => 'Você tem certeza?',
+            'description' => 'O contato :name será permanentemente excluído!',
+        ],
+
         'form' => [
             'common' => [
                 'contact-information' => 'Informações de Contato',
