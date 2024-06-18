@@ -395,6 +395,7 @@ onMounted(() => {
 
 <style>
 #map {
+    min-height: 400px;
     height: 100%;
     width: 100%;
 }
