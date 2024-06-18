@@ -19,7 +19,10 @@ return [
 
     'ui' => [
         'app-nav' => [
-            'contacts' => 'Contacts',
+            'contacts'       => 'Contacts',
+            'manage-account' => 'Manage Account',
+            'profile'        => 'Profile',
+            'logout'         => 'Log out',
         ],
     ],
 ];

@@ -19,7 +19,10 @@ return [
 
     'ui' => [
         'app-nav' => [
-            'contacts' => 'Contatos',
+            'contacts'       => 'Contatos',
+            'manage-account' => 'Gerenciar Conta',
+            'profile'        => 'Meu Perfil',
+            'logout'         => 'Sair',
         ],
     ],
 ];

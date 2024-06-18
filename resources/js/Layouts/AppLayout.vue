@@ -266,13 +266,17 @@ const logout = () => {
                                         <div
                                             class="block px-4 py-2 text-xs text-gray-400"
                                         >
-                                            Manage Account
+                                            {{
+                                                $t(
+                                                    "words.ui.app-nav.manage-account"
+                                                )
+                                            }}
                                         </div>
 
                                         <DropdownLink
                                             :href="route('profile.show')"
                                         >
-                                            Profile
+                                            {{ $t("words.ui.app-nav.profile") }}
                                         </DropdownLink>
 
                                         <DropdownLink
@@ -292,7 +296,11 @@ const logout = () => {
                                         <!-- Authentication -->
                                         <form @submit.prevent="logout">
                                             <DropdownLink as="button">
-                                                Log Out
+                                                {{
+                                                    $t(
+                                                        "words.ui.app-nav.logout"
+                                                    )
+                                                }}
                                             </DropdownLink>
                                         </form>
                                     </template>
