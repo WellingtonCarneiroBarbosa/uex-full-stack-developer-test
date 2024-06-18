@@ -212,6 +212,21 @@ const states = computed(() => {
 
     <div class="col-span-12 md:col-span-6">
         <InputLabel
+            for="neighborhood"
+            :value="ucfirst($t('validation.attributes.address_neighborhood'))"
+        />
+        <TextInput
+            :disabled="form.processing"
+            id="neighborhood"
+            v-model="form.address_neighborhood"
+            type="text"
+            class="mt-1 block w-full"
+        />
+        <InputError :message="form.errors.address_neighborhood" class="mt-2" />
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+        <InputLabel
             for="street"
             :value="ucfirst($t('validation.attributes.address_street'))"
         />

@@ -35,23 +35,18 @@ class AddressProvider extends GoogleGeocodingAPI implements AddressProviderInter
                 $postalCode   = "";
 
                 if ($key === "address_components") {
-                    /**
-                     * 0 = street
-                     * 1 = neighborhood
-                     * 2 = city
-                     * 3 = state
-                     * 4 = country
-                     * 5 = postal code
-                     */
-                    foreach ($location as $addressKey => $addressComponent) {
-                        match ($addressKey) {
-                            0       => $street       = $addressComponent['long_name'],
-                            1       => $neighborhood = $addressComponent['long_name'],
-                            2       => $city         = $addressComponent['long_name'],
-                            3       => $state        = $addressComponent['short_name'],
-                            5       => $postalCode   = $this->normalizePostalCode(extractDigitsRegex($addressComponent['long_name'])),
-                            default => null,
+                    foreach ($location as $addressComponent) {
+                        match ($addressComponent['types'][0]) {
+                            "route"                       => $street     = $addressComponent['long_name'],
+                            "administrative_area_level_2" => $city       = $addressComponent['long_name'],
+                            "administrative_area_level_1" => $state      = $addressComponent['short_name'],
+                            "postal_code"                 => $postalCode = $this->normalizePostalCode(extractDigitsRegex($addressComponent['long_name'])),
+                            default                       => null,
                         };
+
+                        if (isset($addressComponent['types'][1]) && $addressComponent['types'][1] === "sublocality") {
+                            $neighborhood = $addressComponent['long_name'];
+                        }
                     }
 
                     array_push($data, new AddressDTO(
