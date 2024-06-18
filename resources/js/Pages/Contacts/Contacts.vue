@@ -1,17 +1,14 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
 import { trans } from "laravel-vue-i18n";
-
-import { computed, onMounted, ref, reactive, onUpdated } from "vue";
+import { computed, onMounted, ref, onUpdated } from "vue";
 import StringMask from "string-mask";
 import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
 import { useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import ContactItem from "./Partials/ContactItem.vue";
-
 import Filter from "./Partials/Filter.vue";
 
 const props = defineProps({
@@ -236,6 +233,7 @@ onUpdated(() => {
     >
         <div class="p-4">
             <Form
+                @submitted="resetFormComponent()"
                 @cancel="resetFormComponent()"
                 :contact-id="selectedContact?.id"
                 :mode="form.mode"

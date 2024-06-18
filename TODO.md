@@ -12,6 +12,6 @@
 [x] - Excluir conta solicitando senha
 [x] - Implementar API Rest de todos os endpoints
 [] - Implementar documentação dos endpoints da API
-[] - Implementar toast notifications
+[X] - Implementar toast notifications
 [X] - Implementar dark mode toggle
 [] - Implementar language selector

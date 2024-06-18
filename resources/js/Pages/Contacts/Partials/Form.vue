@@ -11,7 +11,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { vMaska } from "maska";
 import { reactive } from "vue";
-import { useToast } from "vue-toast-notification";
+import { useToast } from "vue-toastification";
 
 const props = defineProps({
     form: Object,
@@ -57,8 +57,13 @@ const submit = async () => {
     if (props.mode === "create") {
         props.form.post(route("dash.contacts.store"), {
             onSuccess: (response) => {
-                const $toast = useToast();
-                $toast.success(response.props.flash.message);
+                const toast = useToast();
+
+                toast.success(response.props.flash.message, {
+                    timeout: 3000,
+                });
+
+                emit("submitted");
             },
         });
     }
@@ -68,8 +73,13 @@ const submit = async () => {
             route("dash.contacts.update", { contact: props.contactId }),
             {
                 onSuccess: (response) => {
-                    const $toast = useToast();
-                    $toast.success(response.props.flash.message);
+                    const toast = useToast();
+
+                    toast.success(response.props.flash.message, {
+                        timeout: 3000,
+                    });
+
+                    emit("submitted");
                 },
             }
         );
