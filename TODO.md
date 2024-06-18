@@ -13,5 +13,5 @@
 [x] - Implementar API Rest de todos os endpoints
 [] - Implementar documentação dos endpoints da API
 [] - Implementar toast notifications
-[] - Implementar dark mode toggle
+[X] - Implementar dark mode toggle
 [] - Implementar language selector

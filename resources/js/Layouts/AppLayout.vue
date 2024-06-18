@@ -7,6 +7,7 @@ import Dropdown from "@/Components/Dropdown.vue";
 import DropdownLink from "@/Components/DropdownLink.vue";
 import NavLink from "@/Components/NavLink.vue";
 import ResponsiveNavLink from "@/Components/ResponsiveNavLink.vue";
+import ToggleDarkMode from "@/Components/ToggleDarkMode.vue";
 
 defineProps({
     title: String,
@@ -207,6 +208,8 @@ const logout = () => {
                                 </Dropdown>
                             </div>
 
+                            <ToggleDarkMode />
+
                             <!-- Settings Dropdown -->
                             <div class="ms-3 relative">
                                 <Dropdown align="right" width="48">
@@ -219,7 +222,7 @@ const logout = () => {
                                             class="flex text-sm border-2 border-transparent rounded-full focus:outline-none focus:border-gray-300 transition"
                                         >
                                             <img
-                                                class="h-8 w-8 rounded-full object-cover"
+                                                class="h-12 w-12 rounded-full object-cover"
                                                 :src="
                                                     $page.props.auth.user
                                                         .profile_photo_url
