@@ -12,7 +12,7 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 
 /**
- *
+ * 
  *
  * @property int $id
  * @property mixed $name
@@ -95,7 +95,13 @@ class Contact extends Model
     {
         $cep = format($this->address_cep, '#####-###');
 
-        $address = "{$this->address_street}, {$this->address_number}, {$this->address_complement}, {$this->address_neighborhood}, {$this->address_city}, {$this->getAddressStateNameAttribute()} - {$cep}";
+        $address = "{$this->address_street}, {$this->address_number}, ";
+
+        if ($this->address_complement) {
+            $address .= "$this->address_complement, ";
+        }
+
+        $address .= "{$this->address_neighborhood}, {$this->address_city}, {$this->getAddressStateNameAttribute()} - {$cep}";
 
         return trim($address, ', ');
     }

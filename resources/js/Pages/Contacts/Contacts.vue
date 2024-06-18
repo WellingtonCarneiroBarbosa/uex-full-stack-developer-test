@@ -32,8 +32,6 @@ const formData = useForm({
     longitude: "",
 });
 
-const map = ref(null);
-
 const markers = ref([]);
 
 const form = ref({
@@ -65,7 +63,7 @@ const pushContacts = (contact) => {
     if (index !== -1) {
         selectedContacts.value.splice(index, 1);
 
-        removeMarker(contact.id);
+        removeMarker(contact.id, contact.latitude, contact.longitude);
     } else {
         selectedContacts.value.push(contact);
 
@@ -88,7 +86,7 @@ const addMarkerOnMap = async (id, title, lat, lng) => {
     const marker = new AdvancedMarkerElement({
         map: window.map,
         position: { lat: lat, lng: lng },
-        // title: title,
+        title: title,
     });
 
     markers.value.push({
@@ -101,12 +99,16 @@ const addMarkerOnMap = async (id, title, lat, lng) => {
     window.map.setZoom(14);
 };
 
-const removeMarker = (id) => {
+const removeMarker = (id, lat, lng) => {
     let marker = markers.value.find((marker) => marker.id === id);
 
     if (marker) {
         marker.marker.setMap(null);
         markers.value = markers.value.filter((marker) => marker.id !== id);
+
+        window.map.setCenter({ lat: lat, lng: lng });
+
+        window.map.setZoom(14);
     }
 };
 
@@ -274,7 +276,7 @@ onMounted(() => {
 
 <style>
 #map {
-    height: 400px; /* The height is 400 pixels */
-    width: 100%; /* The width is the width of the web page */
+    height: 100%;
+    width: 100%;
 }
 </style>
