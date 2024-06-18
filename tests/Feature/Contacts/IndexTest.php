@@ -11,6 +11,65 @@ class IndexTest extends TestCase
 {
     use RefreshDatabase;
 
+    public function testAssertResultsCanBeFiltered(): void
+    {
+        $user  = User::factory()->create();
+        $token = $user->createToken('test')->plainTextToken;
+
+        Contact::factory()->for($user, 'user')->create([
+            'name' => 'john doe',
+            'cpf'  => '50341993000',
+        ]);
+
+        Contact::factory(50)->for($user, 'user')->create();
+
+        $response = $this->json(
+            'GET',
+            route('api.contact.index'),
+            data: [
+                'cpf' => '50341993000',
+            ],
+            headers: [
+                'Authorization' => 'Bearer ' . $token,
+            ]
+        );
+
+        $responseData = json_decode($response->getContent(), true)['data'];
+
+        $response->assertJsonStructure([
+            'data' => [
+                'items',
+            ],
+        ]);
+
+        $this->assertCount(1, $responseData['items']);
+
+        $this->assertEquals('50341993000', $responseData['items'][0]['cpf']);
+
+        $response = $this->json(
+            'GET',
+            route('api.contact.index'),
+            data: [
+                'name' => 'john doe',
+            ],
+            headers: [
+                'Authorization' => 'Bearer ' . $token,
+            ]
+        );
+
+        $responseData = json_decode($response->getContent(), true)['data'];
+
+        $response->assertJsonStructure([
+            'data' => [
+                'items',
+            ],
+        ]);
+
+        $this->assertCount(1, $responseData['items']);
+
+        $this->assertEquals('John Doe', $responseData['items'][0]['name']);
+    }
+
     public function testAssertContactsListCanBeRetrieved(): void
     {
         $user  = User::factory()->create();
