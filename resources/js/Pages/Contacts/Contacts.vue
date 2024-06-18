@@ -10,6 +10,7 @@ import PrimaryButton from "@/Components/PrimaryButton.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import ContactItem from "./Partials/ContactItem.vue";
 import Filter from "./Partials/Filter.vue";
+import { useToast } from "vue-toastification";
 
 const props = defineProps({
     contacts: Object,
@@ -109,6 +110,11 @@ const confirmContactDeleting = () => {
             onSuccess: (response) => {
                 showConfirmDeleteDialog.value = false;
                 selectedContact.value = null;
+
+                const toast = useToast();
+                toast.success(response.props.flash.message, {
+                    timeout: 3000,
+                });
             },
         }
     );
