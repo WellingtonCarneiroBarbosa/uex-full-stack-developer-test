@@ -2,11 +2,13 @@
 
 namespace App\Providers;
 
+use App\Contracts\AddressProviderInterface;
 use App\Contracts\CepProviderInterface;
 use App\Contracts\CoordinatesProviderInterface;
 use App\Services\BrasilAPI;
 use App\Services\CepProviderManager\CepProviderManager;
-use App\Services\GoogleGeocodingAPI\GoogleGeocodingAPI;
+use App\Services\GoogleGeocodingAPI\AddressProvider as GoogleAddressProvider;
+use App\Services\GoogleGeocodingAPI\CoordinatesProvider as GoogleCoordinatesProvider;
 use App\Services\ViaCep\ViaCepProvider;
 use Dedoc\Scramble\Scramble;
 use Dedoc\Scramble\Support\Generator\SecurityScheme;
@@ -29,7 +31,11 @@ class AppServiceProvider extends ServiceProvider
         });
 
         $this->app->singleton(CoordinatesProviderInterface::class, function ($app) {
-            return new GoogleGeocodingAPI();
+            return new GoogleCoordinatesProvider();
+        });
+
+        $this->app->singleton(AddressProviderInterface::class, function ($app) {
+            return new GoogleAddressProvider();
         });
     }
 
