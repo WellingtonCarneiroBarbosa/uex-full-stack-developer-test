@@ -1,29 +1,21 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { ucfirst, removeEmptyOrNull } from "@/Helpers/functions";
 import { trans } from "laravel-vue-i18n";
-import { Dot } from "lucide-vue-next";
+
 import { computed, onMounted, ref, reactive, onUpdated } from "vue";
 import StringMask from "string-mask";
 import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
 import { useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import Dropdown from "@/Components/Dropdown.vue";
+
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
-import InputLabel from "@/Components/InputLabel.vue";
-import TextInput from "@/Components/TextInput.vue";
-import InputError from "@/Components/InputError.vue";
-import { vMaska } from "maska";
-import SecondaryButton from "@/Components/SecondaryButton.vue";
+import ContactItem from "./Partials/ContactItem.vue";
+
+import Filter from "./Partials/Filter.vue";
 
 const props = defineProps({
     contacts: Object,
-});
-
-const cpfMask = reactive({
-    mask: "###.###.###-##",
-    eager: true,
 });
 
 const filterMode = ref(false);
@@ -185,21 +177,6 @@ const filterForm = useForm({
     cpf: "",
 });
 
-const filter = () => {
-    filterForm
-        .transform((data) => {
-            return removeEmptyOrNull(data);
-        })
-        .get(route("dash.contacts.index"), {
-            errorBag: "filter",
-            preserveScroll: true,
-            preserveState: true,
-            onSuccess: () => {
-                filterMode.value = true;
-            },
-        });
-};
-
 const clearFilters = () => {
     filterForm.cpf = "";
     filterForm.name = "";
@@ -235,9 +212,13 @@ async function initMap() {
     window.map = customMap;
 }
 
-initMap();
-
 onMounted(() => {
+    const urlParams = new URLSearchParams(window.location.search);
+
+    if (urlParams.has("cpf") || urlParams.has("name")) {
+        filterMode.value = true;
+    }
+
     initMap();
 });
 
@@ -312,173 +293,22 @@ onUpdated(() => {
                         <div
                             class="col-span-12 lg:col-span-5 pb-2 lg:pr-4 lg:pb-0"
                         >
-                            <div
-                                class="grid grid-cols-12 gap-4 mb-4 border-b lg:border-none pb-3"
-                            >
-                                <div class="col-span-12 lg:col-span-6">
-                                    <InputLabel for="filter-name">{{
-                                        ucfirst(
-                                            $t("validation.attributes.name")
-                                        )
-                                    }}</InputLabel>
-                                    <TextInput
-                                        id="filter-name"
-                                        class="w-full"
-                                        v-model="filterForm.name"
-                                        :disabled="filterForm.processing"
-                                    />
-                                    <InputError
-                                        :message="filterForm.errors.name"
-                                    />
-                                </div>
-
-                                <div class="col-span-12 lg:col-span-6">
-                                    <InputLabel for="filter-cpf">{{
-                                        $t("validation.attributes.cpf")
-                                    }}</InputLabel>
-                                    <TextInput
-                                        id="filter-cpf"
-                                        class="w-full"
-                                        v-model="filterForm.cpf"
-                                        :disabled="filterForm.processing"
-                                        v-maska:[cpfMask]
-                                    />
-                                    <InputError
-                                        :message="filterForm.errors.cpf"
-                                    />
-                                </div>
-
-                                <div class="col-span-6"></div>
-
-                                <div
-                                    class="col-span-6 flex justify-end items-center gap-x-2"
-                                >
-                                    <SecondaryButton
-                                        v-if="filterMode"
-                                        @click="clearFilters"
-                                        >Limpar filtros</SecondaryButton
-                                    >
-                                    <PrimaryButton
-                                        @click="filter"
-                                        :disabled="filterForm.processing"
-                                        class="float-end"
-                                        >Filtrar</PrimaryButton
-                                    >
-                                </div>
-                            </div>
+                            <Filter
+                                :form="filterForm"
+                                :clear-filters="clearFilters"
+                                @filtered="filterMode = true"
+                            />
                             <div
                                 class="flex pb-4 overflow-x-auto"
                                 v-for="contact in contactsFormatted"
                                 :key="contact.id"
                             >
-                                <div class="flex flex-row items-center gap-4">
-                                    <div>
-                                        <input
-                                            :id="`check-contact-${contact.id}`"
-                                            placeholder="check box"
-                                            type="checkbox"
-                                            class="checkbox rounded-md cursor-pointer h-4 w-4"
-                                            @change="pushContacts(contact)"
-                                        />
-                                    </div>
-
-                                    <label
-                                        :for="`check-contact-${contact.id}`"
-                                        class="cursor-pointer"
-                                    >
-                                        <div class="flex flex-row items-center">
-                                            <img
-                                                class="h-10 w-10 rounded-full object-cover"
-                                                :src="
-                                                    contact.picture ??
-                                                    `https://ui-avatars.com/api/?name=${contact.name}`
-                                                "
-                                                alt="wellington barbosa"
-                                            />
-                                            <div class="ml-4 w-full">
-                                                <ul>
-                                                    <li
-                                                        class="text-lg text-gray-800 dark:text-gray-100"
-                                                    >
-                                                        {{ contact.name }}
-                                                    </li>
-                                                    <li
-                                                        class="text-sm dark:text-gray-400 mt-1"
-                                                    >
-                                                        <a
-                                                            :href="`https://wa.me/55${contact.phone}`"
-                                                            class="hover:underline"
-                                                        >
-                                                            {{
-                                                                contact.phone_formatted
-                                                            }}
-                                                        </a>
-                                                    </li>
-                                                    <li
-                                                        class="text-sm dark:text-gray-400 mt-1"
-                                                    >
-                                                        <a
-                                                            :href="`mailto:${contact.email}`"
-                                                            class="hover:underline"
-                                                        >
-                                                            {{ contact.email }}
-                                                        </a>
-                                                    </li>
-
-                                                    <li
-                                                        class="text-sm dark:text-gray-400 mt-1"
-                                                    >
-                                                        {{
-                                                            contact.full_address
-                                                        }}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <div class="flex">
-                                        <Dropdown>
-                                            <template #trigger>
-                                                <button
-                                                    aria-label="erase"
-                                                    class="flex focus:bg-white hover:bg-white dark:focus:bg-slate-600 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-md"
-                                                >
-                                                    <Dot />
-                                                    <Dot class="-ml-4" />
-                                                    <Dot class="-ml-4" />
-                                                </button>
-                                            </template>
-
-                                            <template #content>
-                                                <div class="p-1">
-                                                    <button
-                                                        class="w-full rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-start p-1"
-                                                        @click="
-                                                            editContact(contact)
-                                                        "
-                                                    >
-                                                        {{
-                                                            $t("words.details")
-                                                        }}
-                                                        / {{ $t("words.edit") }}
-                                                    </button>
-
-                                                    <button
-                                                        class="w-full rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-start p-1"
-                                                        @click="
-                                                            deleteContact(
-                                                                contact
-                                                            )
-                                                        "
-                                                    >
-                                                        {{ $t("words.delete") }}
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </Dropdown>
-                                    </div>
-                                </div>
+                                <ContactItem
+                                    :contact="contact"
+                                    @edit="editContact(contact)"
+                                    @delete="deleteContact(contact)"
+                                    @checked="pushContacts(contact)"
+                                />
                             </div>
                         </div>
                         <div
