@@ -4,7 +4,7 @@ import SelectInput from "@/Components/SelectInput.vue";
 import TextInput from "@/Components/TextInput.vue";
 import InputError from "@/Components/InputError.vue";
 import { ucfirst } from "@/Helpers/functions";
-import { nextTick, watch, reactive, computed } from "vue";
+import { nextTick, reactive, computed } from "vue";
 import { vMaska } from "maska";
 
 const props = defineProps({
@@ -44,9 +44,7 @@ const setAddressByCep = (cep) => {
 };
 
 const handleCepChange = (e) => {
-    if (props.mode === "edit") {
-        setAddressByCep(e.target.value);
-    }
+    setAddressByCep(e.target.value);
 };
 
 const states = computed(() => {
@@ -161,20 +159,6 @@ const states = computed(() => {
         },
     ];
 });
-
-watch(
-    () => props.form.address_cep,
-    (cep) => {
-        if (props.mode === "edit") {
-            return;
-        }
-
-        setAddressByCep(cep);
-    },
-    {
-        immediate: true,
-    }
-);
 </script>
 
 <template>
@@ -224,6 +208,21 @@ watch(
             class="mt-1 block w-full"
         />
         <InputError :message="form.errors.address_city" class="mt-2" />
+    </div>
+
+    <div class="col-span-12 md:col-span-6">
+        <InputLabel
+            for="neighborhood"
+            :value="ucfirst($t('validation.attributes.address_neighborhood'))"
+        />
+        <TextInput
+            :disabled="form.processing"
+            id="neighborhood"
+            v-model="form.address_neighborhood"
+            type="text"
+            class="mt-1 block w-full"
+        />
+        <InputError :message="form.errors.address_neighborhood" class="mt-2" />
     </div>
 
     <div class="col-span-12 md:col-span-6">

@@ -16,3 +16,5 @@
 [X] - Implementar dark mode toggle
 [] - Implementar language selector
 [X] - Implementar paginação
+[] - Implementar testes da API
+[] - Implementar buscador de endereços

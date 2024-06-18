@@ -234,6 +234,14 @@ async function initMap() {
     window.map = customMap;
 }
 
+const updateContactsList = () => {
+    resetFormComponent();
+
+    router.reload({
+        only: ["contacts"],
+    });
+};
+
 onMounted(() => {
     const urlParams = new URLSearchParams(window.location.search);
 
@@ -258,7 +266,7 @@ onUpdated(() => {
     >
         <div class="p-4">
             <Form
-                @submitted="resetFormComponent()"
+                @submitted="updateContactsList"
                 @cancel="resetFormComponent()"
                 :contact-id="selectedContact?.id"
                 :mode="form.mode"
