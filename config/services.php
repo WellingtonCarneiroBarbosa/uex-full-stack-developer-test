@@ -35,4 +35,12 @@ return [
         ],
     ],
 
+    'via-cep' => [
+        'base-url' => env('VIA_CEP_BASE_URL', 'https://viacep.com.br'),
+    ],
+
+    'brasil-api' => [
+        'base-url' => env('BRASIL_API_BASE_URL', 'https://brasilapi.com.br'),
+    ],
+
 ];

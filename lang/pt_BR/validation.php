@@ -136,6 +136,7 @@ return [
     'starts_with'          => 'O campo :attribute deve começar com um dos seguintes valores: :values',
     'string'               => 'O campo :attribute deve ser uma string.',
     'timezone'             => 'O campo :attribute deve ser uma zona válida.',
+    'invalid_cep'          => 'O cep :cep é inválido ou não existe.',
     'unique'               => 'O campo :attribute já está sendo utilizado.',
     'uploaded'             => 'Ocorreu uma falha no upload do campo :attribute.',
     'url'                  => 'O campo :attribute tem um formato inválido.',
