@@ -76,6 +76,35 @@ class CreateTest extends TestCase
         ]);
     }
 
+    #[DataProvider('contactProvider')]
+    public function testAssertAContactWithSameCPFCanBeCreatedForDifferentUsers(array $contactData): void
+    {
+        $user   = User::factory()->create();
+
+        $this->actingAs($user);
+
+        $response = $this->post(
+            route('api.contact.store'),
+            $contactData,
+        );
+
+        $user2 = User::factory()->create();
+
+        $this->actingAs($user2);
+
+        $response = $this->post(
+            route('api.contact.store'),
+            $contactData,
+        );
+
+        $response->assertSessionHasNoErrors();
+
+        $this->assertDatabaseHas('contacts', [
+            'cpf'     => '71641438037',
+            'user_id' => $user2->id,
+        ]);
+    }
+
     public static function contactProvider(): array
     {
         return [

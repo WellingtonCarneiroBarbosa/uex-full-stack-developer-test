@@ -14,9 +14,9 @@ return new class () extends Migration {
         Schema::create('contacts', function (Blueprint $table) {
             $table->id();
             $table->string('name');
-            $table->string('email')->unique()->index();
-            $table->string('cpf', 11)->unique()->index();
-            $table->string('phone')->unique()->index();
+            $table->string('email')->index();
+            $table->string('cpf', 11)->index();
+            $table->string('phone')->index();
             $table->decimal('latitude', 10, 7);
             $table->decimal('longitude', 10, 7);
             $table->string('address_cep', 8);
@@ -28,6 +28,10 @@ return new class () extends Migration {
             $table->string('address_complement')->nullable();
             $table->foreignIdFor(User::class)->constrained();
             $table->timestamps();
+
+            $table->unique(['cpf', 'user_id']);
+            $table->unique(['email', 'user_id']);
+            $table->unique(['phone', 'user_id']);
         });
     }
 

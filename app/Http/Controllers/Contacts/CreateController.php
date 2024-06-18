@@ -16,6 +16,8 @@ class CreateController extends Controller
 
         $data = $request->validated();
 
+        $userId = $request->user()->id;
+
         $contact = new Contact();
         $contact->forceFill($data);
         $contact->user()->associate($request->user());
