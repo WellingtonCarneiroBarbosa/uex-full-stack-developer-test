@@ -108,7 +108,7 @@ return [
             ],
 
             'edit' => [
-                'title'       => 'Editar :name',
+                'title'       => 'Editar Contato',
                 'description' => 'Atualize as informações do contato',
             ],
         ],

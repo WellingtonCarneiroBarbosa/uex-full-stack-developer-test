@@ -19,6 +19,7 @@ const props = defineProps({
         type: String,
         default: "create",
     },
+    contactId: String,
 });
 
 const cpfMask = reactive({
@@ -43,13 +44,35 @@ const pageTranslations = (name = "", attributes = {}) => {
     return trans(`pages.contacts.form.${props.mode}.${name}`, attributes);
 };
 
-const submit = () => {
+const submit = async () => {
+    props.form.clearErrors();
+
+    await getCoordinates()
+        .then(function (coordinates) {
+            props.form.latitude = coordinates.latitude;
+            props.form.longitude = coordinates.longitude;
+        })
+        .catch(() => {});
+
     if (props.mode === "create") {
-        create();
+        props.form.post(route("dash.contacts.store"), {
+            onSuccess: (response) => {
+                const $toast = useToast();
+                $toast.success(response.props.flash.message);
+            },
+        });
     }
 
     if (props.mode === "edit") {
-        //update();
+        props.form.put(
+            route("dash.contacts.update", { contact: props.contactId }),
+            {
+                onSuccess: (response) => {
+                    const $toast = useToast();
+                    $toast.success(response.props.flash.message);
+                },
+            }
+        );
     }
 };
 
@@ -68,6 +91,8 @@ const getCoordinates = () => {
             return;
         }
 
+        form.processing = true;
+
         window.axios
             .get(
                 route("dash.get-coordinates", {
@@ -82,30 +107,12 @@ const getCoordinates = () => {
             });
     });
 };
-
-const create = async () => {
-    props.form.clearErrors();
-
-    await getCoordinates()
-        .then(function (coordinates) {
-            props.form.latitude = coordinates.latitude;
-            props.form.longitude = coordinates.longitude;
-        })
-        .catch(() => {});
-
-    props.form.post(route("dash.contacts.store"), {
-        onSuccess: (response) => {
-            const $toast = useToast();
-            $toast.success(response.props.flash.message);
-        },
-    });
-};
 </script>
 
 <template>
     <FormSection @submitted="submit">
         <template #title>
-            {{ pageTranslations("title", { name: form.name }) }}
+            {{ pageTranslations("title") }}
         </template>
 
         <template #description>
@@ -190,7 +197,7 @@ const create = async () => {
                 </h1>
             </div>
 
-            <Address :form="form" />
+            <Address :mode="mode" :form="form" />
         </template>
 
         <template #actions>

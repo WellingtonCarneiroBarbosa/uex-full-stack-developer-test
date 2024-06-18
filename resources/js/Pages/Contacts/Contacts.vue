@@ -9,6 +9,7 @@ import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
 import { useForm } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
+import Dropdown from "@/Components/Dropdown.vue";
 
 const props = defineProps({
     contacts: Object,
@@ -32,6 +33,8 @@ const formData = useForm({
     longitude: "",
 });
 
+const selectedContact = ref(null);
+
 const markers = ref([]);
 
 const form = ref({
@@ -43,6 +46,7 @@ const resetFormComponent = () => {
     form.value.show = false;
     form.value.mode = "create";
     formData.reset();
+    selectedContact.value = null;
 };
 
 const selectedContacts = ref([]);
@@ -56,6 +60,28 @@ const contactsFormatted = computed(() => {
         };
     });
 });
+
+const editContact = (contact) => {
+    formData.name = contact.name;
+    formData.email = contact.email;
+    formData.phone = contact.phone;
+    formData.cpf = contact.cpf;
+    formData.address_cep = contact.address_cep;
+    formData.address_uf = contact.address_uf;
+    formData.address_city = contact.address_city;
+    formData.address_neighborhood = contact.address_neighborhood;
+    formData.address_city = contact.address_city;
+    formData.address_street = contact.address_street;
+    formData.address_number = contact.address_number;
+    formData.address_complement = contact.address_complement;
+    formData.latitude = contact.latitude;
+    formData.longitude = contact.longitude;
+    formData.address_complement = contact.address_complement;
+
+    selectedContact.value = contact;
+    form.value.mode = "edit";
+    form.value.show = true;
+};
 
 const pushContacts = (contact) => {
     const index = selectedContacts.value.findIndex((c) => c.id === contact.id);
@@ -145,7 +171,12 @@ onMounted(() => {
         @close="resetFormComponent()"
     >
         <div class="p-4">
-            <Form @cancel="resetFormComponent()" :form="formData" />
+            <Form
+                @cancel="resetFormComponent()"
+                :contact-id="selectedContact?.id"
+                :mode="form.mode"
+                :form="formData"
+            />
         </div>
     </Modal>
 
@@ -249,14 +280,34 @@ onMounted(() => {
                                     </label>
 
                                     <div class="flex">
-                                        <button
-                                            aria-label="erase"
-                                            class="flex focus:bg-white hover:bg-white dark:focus:bg-slate-600 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-md"
-                                        >
-                                            <Dot />
-                                            <Dot class="-ml-4" />
-                                            <Dot class="-ml-4" />
-                                        </button>
+                                        <Dropdown>
+                                            <template #trigger>
+                                                <button
+                                                    aria-label="erase"
+                                                    class="flex focus:bg-white hover:bg-white dark:focus:bg-slate-600 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-md"
+                                                >
+                                                    <Dot />
+                                                    <Dot class="-ml-4" />
+                                                    <Dot class="-ml-4" />
+                                                </button>
+                                            </template>
+
+                                            <template #content>
+                                                <div class="p-1">
+                                                    <button
+                                                        class="w-full rounded-md hover:bg-slate-600 text-start p-1"
+                                                        @click="
+                                                            editContact(contact)
+                                                        "
+                                                    >
+                                                        {{
+                                                            $t("words.details")
+                                                        }}
+                                                        / {{ $t("words.edit") }}
+                                                    </button>
+                                                </div>
+                                            </template>
+                                        </Dropdown>
                                     </div>
                                 </div>
                             </div>

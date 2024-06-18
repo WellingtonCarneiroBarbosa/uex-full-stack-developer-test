@@ -13,6 +13,7 @@ return [
     'unknown' => 'Unknown',
     'done'    => 'Feito',
     'add'     => 'Add',
+    'details' => 'Details',
 
     'ui' => [
         'app-nav' => [
