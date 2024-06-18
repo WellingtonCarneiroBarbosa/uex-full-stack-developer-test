@@ -21,7 +21,7 @@ class UpdateController extends Controller
                 'type'    => 'success',
                 'message' => __('messages.contacts.updated'),
             ]),
-            api: fn () => (new ContactResource($contact))->response()->setStatusCode(201)
+            api: fn () => (new ContactResource($contact))->response()->setStatusCode(200)
         );
     }
 }
