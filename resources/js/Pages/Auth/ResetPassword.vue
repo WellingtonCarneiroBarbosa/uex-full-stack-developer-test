@@ -6,6 +6,8 @@ import InputError from "@/Components/InputError.vue";
 import InputLabel from "@/Components/InputLabel.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import TextInput from "@/Components/TextInput.vue";
+import { ucwords } from "@/Helpers/functions";
+import { trans } from "laravel-vue-i18n";
 
 const props = defineProps({
     email: String,
@@ -24,6 +26,10 @@ const submit = () => {
         onFinish: () => form.reset("password", "password_confirmation"),
     });
 };
+
+const pageTranslations = (name = "", attributes = {}) => {
+    return trans(`pages.auth.reset-password.${name}`, attributes);
+};
 </script>
 
 <template>
@@ -35,25 +41,15 @@ const submit = () => {
         </template>
 
         <form @submit.prevent="submit">
-            <div>
-                <InputLabel for="email" value="Email" />
-                <TextInput
-                    id="email"
-                    v-model="form.email"
-                    type="email"
-                    class="mt-1 block w-full"
-                    required
-                    autofocus
-                    autocomplete="username"
-                />
-                <InputError class="mt-2" :message="form.errors.email" />
-            </div>
-
             <div class="mt-4">
-                <InputLabel for="password" value="Password" />
+                <InputLabel
+                    for="password"
+                    :value="ucwords($t('validation.attributes.password'))"
+                />
                 <TextInput
                     id="password"
                     v-model="form.password"
+                    :disabled="form.processing"
                     type="password"
                     class="mt-1 block w-full"
                     required
@@ -65,11 +61,14 @@ const submit = () => {
             <div class="mt-4">
                 <InputLabel
                     for="password_confirmation"
-                    value="Confirm Password"
+                    :value="
+                        ucwords($t('validation.attributes.confirm-password'))
+                    "
                 />
                 <TextInput
                     id="password_confirmation"
                     v-model="form.password_confirmation"
+                    :disabled="form.processing"
                     type="password"
                     class="mt-1 block w-full"
                     required
@@ -86,7 +85,7 @@ const submit = () => {
                     :class="{ 'opacity-25': form.processing }"
                     :disabled="form.processing"
                 >
-                    Reset Password
+                    {{ pageTranslations("title") }}
                 </PrimaryButton>
             </div>
         </form>

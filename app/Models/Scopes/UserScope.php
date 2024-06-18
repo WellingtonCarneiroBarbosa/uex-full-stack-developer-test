@@ -11,7 +11,7 @@ class UserScope implements Scope
     public function apply(Builder $builder, Model $model)
     {
         if (auth()->check()) {
-            $user_id = auth()->user()->id;
+            $user_id = optional(auth()->user())->id;
             $builder->where('user_id', $user_id);
         }
     }

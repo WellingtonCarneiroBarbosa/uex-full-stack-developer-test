@@ -23,6 +23,10 @@ return [
             'disclaimer' => 'Esqueceu sua senha? Sem problemas. Basta nos informar seu endereço de e-mail e enviaremos um link de redefinição de senha para que você possa escolher uma nova.',
             'send'       => 'Enviar link de redefinição',
         ],
+
+        'reset-password' => [
+            'title' => 'Resetar Senha',
+        ],
     ],
 
     'profile' => [
@@ -95,6 +99,15 @@ return [
     'contacts' => [
         'title'       => 'Contatos',
         'description' => 'Gerencie sua lista de contatos',
+
+        'no-contacts' => "Você ainda não possui contatos. Adicione um para começar",
+
+        'any-contacts-found' => "Nenhum contato encontrado",
+
+        'confirm-deleting' => [
+            'title'       => 'Você tem certeza?',
+            'description' => 'O contato :name será permanentemente excluído!',
+        ],
 
         'form' => [
             'common' => [

@@ -23,6 +23,10 @@ return [
             'disclaimer' => 'Forgot your password? No problem. Just let us know your email address and we will email you a password reset link that will allow you to choose a new one.',
             'send'       => 'Send reset link',
         ],
+
+        'reset-password' => [
+            'title' => 'Reset Password',
+        ],
     ],
 
     'profile' => [
@@ -90,4 +94,36 @@ return [
             'are-you-sure' => "Are you sure you want to delete your account? Once your account is deleted, all of its resources and data will be permanently deleted. Please enter your password to confirm you would like to permanently delete your account",
         ],
     ],
+
+    'contacts' => [
+        'title'       => 'Contacts',
+        'description' => 'Manage your contact list',
+
+        'no-contacts' => "You don't have any contacts yet. Add one to get started",
+
+        'any-contacts-found' => "No contacts found",
+
+        'confirm-deleting' => [
+            'title'       => 'Are you sure?',
+            'description' => 'The contact :name will be permanently deleted!',
+        ],
+
+        'form' => [
+            'common' => [
+                'contact-information' => 'Contact Information',
+                'address'             => 'Address',
+            ],
+
+            'create' => [
+                'title'       => 'Add Contact',
+                'description' => 'Enter the contact information to register',
+            ],
+
+            'edit' => [
+                'title'       => 'Edit Contact',
+                'description' => 'Update the contact information',
+            ],
+        ],
+    ],
+
 ];

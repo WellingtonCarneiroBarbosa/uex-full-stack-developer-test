@@ -1,11 +1,13 @@
 import "./bootstrap";
 import "../css/app.css";
+import "vue-toastification/dist/index.css";
 
 import { createApp, h } from "vue";
 import { createInertiaApp } from "@inertiajs/vue3";
 import { resolvePageComponent } from "laravel-vite-plugin/inertia-helpers";
 import { ZiggyVue } from "../../vendor/tightenco/ziggy";
 import { i18nVue } from "laravel-vue-i18n";
+import Toast from "vue-toastification";
 
 const appName = import.meta.env.VITE_APP_NAME || "Laravel";
 
@@ -24,6 +26,7 @@ createInertiaApp({
                     return await langs[`../../lang/${lang}.json`]();
                 },
             })
+            .use(Toast)
             .use(plugin)
             .use(ZiggyVue)
             .mount(el);

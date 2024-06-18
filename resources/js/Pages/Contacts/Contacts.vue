@@ -1,20 +1,23 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { ucfirst } from "@/Helpers/functions";
 import { trans } from "laravel-vue-i18n";
-import { Dot, Plus } from "lucide-vue-next";
-import { computed, onMounted, ref } from "vue";
+import { computed, onMounted, ref, onUpdated } from "vue";
 import StringMask from "string-mask";
 import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
 import { useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
-import Dropdown from "@/Components/Dropdown.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import ContactItem from "./Partials/ContactItem.vue";
+import Filter from "./Partials/Filter.vue";
+import { useToast } from "vue-toastification";
+import { TailwindPagination } from "laravel-vue-pagination";
 
 const props = defineProps({
     contacts: Object,
 });
+
+const filterMode = ref(false);
 
 const formData = useForm({
     name: "",
@@ -108,6 +111,11 @@ const confirmContactDeleting = () => {
             onSuccess: (response) => {
                 showConfirmDeleteDialog.value = false;
                 selectedContact.value = null;
+
+                const toast = useToast();
+                toast.success(response.props.flash.message, {
+                    timeout: 3000,
+                });
             },
         }
     );
@@ -130,6 +138,24 @@ const pushContacts = (contact) => {
             contact.longitude
         );
     }
+};
+
+const paginateContacts = async (page = 1) => {
+    const currentUrl = new URL(window.location.href);
+
+    const params = currentUrl.searchParams;
+
+    params.set("page", page);
+
+    router.get(
+        currentUrl.toString(),
+        {},
+        {
+            preserveScroll: false,
+            preserveState: true,
+            only: ["contacts"],
+        }
+    );
 };
 
 const pageTranslations = (name = "", attributes = {}) => {
@@ -168,27 +194,57 @@ const removeMarker = (id, lat, lng) => {
     }
 };
 
+const filterForm = useForm({
+    name: "",
+    cpf: "",
+});
+
+const clearFilters = () => {
+    filterForm.cpf = "";
+    filterForm.name = "";
+
+    router.get(
+        route("dash.contacts.index"),
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                filterMode.value = false;
+            },
+        }
+    );
+};
+
+let customMap;
+
+async function initMap() {
+    const position = { lat: -25.5, lng: -49.163 };
+
+    //@ts-ignore
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    customMap = new Map(document.getElementById("map"), {
+        zoom: 6,
+        center: position,
+        mapId: "DEMO_MAP_ID",
+    });
+
+    window.map = customMap;
+}
+
 onMounted(() => {
-    let customMap;
+    const urlParams = new URLSearchParams(window.location.search);
 
-    async function initMap() {
-        const position = { lat: -25.5, lng: -49.163 };
-
-        //@ts-ignore
-        const { Map } = await google.maps.importLibrary("maps");
-        const { AdvancedMarkerElement } = await google.maps.importLibrary(
-            "marker"
-        );
-
-        customMap = new Map(document.getElementById("map"), {
-            zoom: 6,
-            center: position,
-            mapId: "DEMO_MAP_ID",
-        });
-
-        window.map = customMap;
+    if (urlParams.has("cpf") || urlParams.has("name")) {
+        filterMode.value = true;
     }
 
+    initMap();
+});
+
+onUpdated(() => {
     initMap();
 });
 </script>
@@ -202,6 +258,7 @@ onMounted(() => {
     >
         <div class="p-4">
             <Form
+                @submitted="resetFormComponent()"
                 @cancel="resetFormComponent()"
                 :contact-id="selectedContact?.id"
                 :mode="form.mode"
@@ -214,17 +271,20 @@ onMounted(() => {
         :show="showConfirmDeleteDialog"
         @close="deleteContactDismissed"
     >
-        <template #title>Você tem certeza?</template>
-        <template #content
-            >O contato {{ selectedContact.name }} será permanentemente
-            excluído!</template
-        >
+        <template #title>{{
+            pageTranslations("confirm-deleting.title")
+        }}</template>
+        <template #content>{{
+            pageTranslations("confirm-deleting.description", {
+                name: selectedContact?.name ?? "",
+            })
+        }}</template>
 
         <template #footer>
             <PrimaryButton
                 id="confirm-contact-delete-button"
                 @click="confirmContactDeleting"
-                >Deletar</PrimaryButton
+                >{{ $t("words.delete") }}</PrimaryButton
             >
         </template>
     </ConfirmationModal>
@@ -257,135 +317,55 @@ onMounted(() => {
                         v-if="contactsFormatted.length >= 1"
                     >
                         <div
-                            class="col-span-12 lg:col-span-4 pb-2 lg:pr-2 lg:pb-0"
+                            class="col-span-12 lg:col-span-5 pb-2 lg:pr-4 lg:pb-0 overflow-y-auto max-h-screen"
                         >
-                            <div class="flex flex-row w-full">Filters</div>
+                            <Filter
+                                :form="filterForm"
+                                :filter-mode="filterMode"
+                                :clear-filters="clearFilters"
+                                @filtered="filterMode = true"
+                            />
                             <div
                                 class="flex pb-4 overflow-x-auto"
                                 v-for="contact in contactsFormatted"
                                 :key="contact.id"
                             >
-                                <div class="flex flex-row items-center gap-4">
-                                    <div>
-                                        <input
-                                            :id="`check-contact-${contact.id}`"
-                                            placeholder="check box"
-                                            type="checkbox"
-                                            class="checkbox rounded-md cursor-pointer h-4 w-4"
-                                            @change="pushContacts(contact)"
-                                        />
-                                    </div>
-
-                                    <label
-                                        :for="`check-contact-${contact.id}`"
-                                        class="cursor-pointer"
-                                    >
-                                        <div class="flex flex-row items-center">
-                                            <img
-                                                class="h-10 w-10 rounded-full object-cover"
-                                                :src="
-                                                    contact.picture ??
-                                                    `https://ui-avatars.com/api/?name=${contact.name}`
-                                                "
-                                                alt="wellington barbosa"
-                                            />
-                                            <div class="ml-4 w-full">
-                                                <ul>
-                                                    <li
-                                                        class="text-lg text-gray-800 dark:text-gray-100"
-                                                    >
-                                                        {{ contact.name }}
-                                                    </li>
-                                                    <li
-                                                        class="text-sm dark:text-gray-400 mt-1"
-                                                    >
-                                                        <a
-                                                            :href="`https://wa.me/55${contact.phone}`"
-                                                            class="hover:underline"
-                                                        >
-                                                            {{
-                                                                contact.phone_formatted
-                                                            }}
-                                                        </a>
-                                                    </li>
-                                                    <li
-                                                        class="text-sm dark:text-gray-400 mt-1"
-                                                    >
-                                                        <a
-                                                            :href="`mailto:${contact.email}`"
-                                                            class="hover:underline"
-                                                        >
-                                                            {{ contact.email }}
-                                                        </a>
-                                                    </li>
-
-                                                    <li
-                                                        class="text-sm dark:text-gray-400 mt-1"
-                                                    >
-                                                        {{
-                                                            contact.full_address
-                                                        }}
-                                                    </li>
-                                                </ul>
-                                            </div>
-                                        </div>
-                                    </label>
-
-                                    <div class="flex">
-                                        <Dropdown>
-                                            <template #trigger>
-                                                <button
-                                                    aria-label="erase"
-                                                    class="flex focus:bg-white hover:bg-white dark:focus:bg-slate-600 dark:hover:bg-slate-600 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-gray-500 rounded-md"
-                                                >
-                                                    <Dot />
-                                                    <Dot class="-ml-4" />
-                                                    <Dot class="-ml-4" />
-                                                </button>
-                                            </template>
-
-                                            <template #content>
-                                                <div class="p-1">
-                                                    <button
-                                                        class="w-full rounded-md hover:bg-slate-600 text-start p-1"
-                                                        @click="
-                                                            editContact(contact)
-                                                        "
-                                                    >
-                                                        {{
-                                                            $t("words.details")
-                                                        }}
-                                                        / {{ $t("words.edit") }}
-                                                    </button>
-
-                                                    <button
-                                                        class="w-full rounded-md hover:bg-slate-600 text-start p-1"
-                                                        @click="
-                                                            deleteContact(
-                                                                contact
-                                                            )
-                                                        "
-                                                    >
-                                                        {{ $t("words.delete") }}
-                                                    </button>
-                                                </div>
-                                            </template>
-                                        </Dropdown>
-                                    </div>
-                                </div>
+                                <ContactItem
+                                    :contact="contact"
+                                    @edit="editContact(contact)"
+                                    @delete="deleteContact(contact)"
+                                    @checked="pushContacts(contact)"
+                                />
                             </div>
                         </div>
                         <div
-                            class="col-span-12 lg:col-span-8 border-t pt-2 lg:border-l lg:pl-2 lg:pt-0 lg:border-t-0"
+                            class="col-span-12 lg:col-span-7 border-t pt-2 lg:border-l lg:pl-2 lg:pt-0 lg:border-t-0"
                         >
                             <div id="map"></div>
                         </div>
                     </div>
 
+                    <TailwindPagination
+                        class="mt-5"
+                        :data="contacts"
+                        @pagination-change-page="paginateContacts"
+                    />
+
                     <p v-if="contactsFormatted.length <= 0">
-                        Você ainda não possui contatos. Adicione um para
-                        começar.
+                        {{
+                            filterMode
+                                ? pageTranslations("any-contacts-found")
+                                : pageTranslations("no-contacts")
+                        }}
+
+                        <span
+                            class="cursor-pointer underline"
+                            v-if="filterMode"
+                            @click="clearFilters"
+                            >{{ $t("words.clear-filters") }}</span
+                        >
                     </p>
+
                     <!-- content-->
                 </div>
             </div>
@@ -395,7 +375,7 @@ onMounted(() => {
 
 <style>
 #map {
-    height: 100%;
+    height: 100vh;
     width: 100%;
 }
 </style>

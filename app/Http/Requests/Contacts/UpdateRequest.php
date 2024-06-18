@@ -5,6 +5,7 @@ namespace App\Http\Requests\Contacts;
 use App\Rules\CPF;
 use App\Utils\BrazilianStates;
 use Illuminate\Foundation\Http\FormRequest;
+use Illuminate\Validation\Rules\Unique;
 
 class UpdateRequest extends FormRequest
 {
@@ -24,9 +25,9 @@ class UpdateRequest extends FormRequest
     {
         return [
             'name'  => ['required'],
-            'email' => ['required', 'email:filter', 'unique:contacts,email,' . $this->route('contact')->id],
-            'phone' => ['required', 'size:11', 'unique:contacts,phone,' . $this->route('contact')->id],
-            'cpf'   => ['required', new CPF(), 'unique:contacts,cpf,' . $this->route('contact')->id],
+            'email' => ['required', 'email:filter', $this->uniqueRule('email')],
+            'phone' => ['required', 'size:11', $this->uniqueRule('phone')],
+            'cpf'   => ['required', new CPF(), $this->uniqueRule('cpf')],
 
             'address_cep'          => ['required', 'size:8'],
             'address_uf'           => ['required', 'size:2', 'in:' . implode(",", (new BrazilianStates())->getStateInitials())],
@@ -38,5 +39,12 @@ class UpdateRequest extends FormRequest
             'latitude'             => ['required',],
             'longitude'            => ['required'],
         ];
+    }
+
+    protected function uniqueRule(string $column): Unique
+    {
+        return (new Unique('contacts', $column))
+            ->where('user_id', optional(auth())->id())
+            ->ignore(optional($this->route('contact'))->id);
     }
 }

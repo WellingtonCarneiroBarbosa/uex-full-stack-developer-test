@@ -26,5 +26,5 @@ Route::middleware([
 
     Route::get('/coordinates/{address}', GetCoordinatesFromAddressController::class)->name('get-coordinates');
 
-    include_once __DIR__ . "/web/contacts.php";
+    require __DIR__ . "/web/contacts.php";
 });

@@ -14,5 +14,5 @@ Route::name('api.')->middleware(['auth:sanctum'])->group(function () {
 
     Route::get('/coordinates/{address}', GetCoordinatesFromAddressController::class)->name('get-coordinates');
 
-    return include_once __DIR__ . '/api/contacts.php';
+    require __DIR__ . '/api/contacts.php';
 });
