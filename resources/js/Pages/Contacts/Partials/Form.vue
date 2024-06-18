@@ -10,8 +10,9 @@ import Address from "@/Components/Form/Address.vue";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import SecondaryButton from "@/Components/SecondaryButton.vue";
 import { vMaska } from "maska";
-import { reactive } from "vue";
+import { nextTick, reactive, ref } from "vue";
 import { useToast } from "vue-toastification";
+import AddressSearcher from "@/Components/AddressSearcher.vue";
 
 const props = defineProps({
     form: Object,
@@ -26,6 +27,8 @@ const cpfMask = reactive({
     mask: "###.###.###-##",
     eager: true,
 });
+
+const showAddressSearcherModal = ref(false);
 
 const phoneNumberMask = reactive({
     mask: (value) =>
@@ -86,6 +89,20 @@ const submit = async () => {
     }
 };
 
+const fillAddress = (address) => {
+    props.form.address_cep = address.cep;
+    props.form.address_uf = address.state.toLowerCase();
+    props.form.address_city = address.city;
+    props.form.address_neighborhood = address.neighborhood;
+    props.form.address_street = address.street;
+
+    showAddressSearcherModal.value = false;
+
+    nextTick(() => {
+        document.getElementById("number")?.focus();
+    });
+};
+
 const getCoordinates = () => {
     return new Promise((resolve, reject) => {
         let form = props.form;
@@ -120,6 +137,12 @@ const getCoordinates = () => {
 </script>
 
 <template>
+    <AddressSearcher
+        :show="showAddressSearcherModal"
+        @close="showAddressSearcherModal = false"
+        @addressSelected="fillAddress"
+    />
+
     <FormSection @submitted="submit">
         <template #title>
             {{ pageTranslations("title") }}
@@ -202,9 +225,17 @@ const getCoordinates = () => {
             <div class="col-span-12">
                 <SectionBorder class="-mt-10 -mb-5" />
 
-                <h1 class="font-bold text-lg">
-                    {{ commonTranslations("address") }}
-                </h1>
+                <div class="flex justify-between">
+                    <h1 class="font-bold text-lg">
+                        {{ commonTranslations("address") }}
+                    </h1>
+
+                    <PrimaryButton
+                        type="button"
+                        @click="showAddressSearcherModal = true"
+                        >Buscar endereço</PrimaryButton
+                    >
+                </div>
             </div>
 
             <Address :mode="mode" :form="form" />
