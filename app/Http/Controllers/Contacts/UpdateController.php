@@ -6,11 +6,14 @@ use App\Http\Controllers\Controller;
 use App\Http\Requests\Contacts\UpdateRequest;
 use App\Http\Resources\Contacts\ContactResource;
 use App\Models\Contact;
+use Gate;
 
 class UpdateController extends Controller
 {
     public function __invoke(UpdateRequest $request, Contact $contact)
     {
+        Gate::authorize('update', $contact);
+
         $data = $request->validated();
 
         $contact->forceFill($data);
@@ -21,7 +24,7 @@ class UpdateController extends Controller
                 'type'    => 'success',
                 'message' => __('messages.contacts.updated'),
             ]),
-            api: fn () => (new ContactResource($contact))->response()->setStatusCode(200)
+            api: fn () => new ContactResource($contact)
         );
     }
 }
