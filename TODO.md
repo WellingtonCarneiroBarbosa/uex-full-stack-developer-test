@@ -11,7 +11,7 @@
 [x] - Integrar google maps
 [x] - Excluir conta solicitando senha
 [x] - Implementar API Rest de todos os endpoints
-[] - Implementar documentação dos endpoints da API
+[x] - Implementar documentação dos endpoints da API
 [X] - Implementar toast notifications
 [X] - Implementar dark mode toggle
 [] - Implementar language selector

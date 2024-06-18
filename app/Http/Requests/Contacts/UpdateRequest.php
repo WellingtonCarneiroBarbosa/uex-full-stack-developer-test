@@ -44,7 +44,7 @@ class UpdateRequest extends FormRequest
     protected function uniqueRule(string $column): Unique
     {
         return (new Unique('contacts', $column))
-            ->where('user_id', auth()->id())
-            ->ignore($this->route('contact')->id);
+            ->where('user_id', optional(auth())->id())
+            ->ignore(optional($this->route('contact'))->id);
     }
 }

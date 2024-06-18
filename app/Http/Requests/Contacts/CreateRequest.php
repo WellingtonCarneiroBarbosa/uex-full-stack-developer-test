@@ -44,6 +44,6 @@ class CreateRequest extends FormRequest
     protected function uniqueRule(string $column): Unique
     {
         return (new Unique('contacts', $column))
-            ->where('user_id', auth()->id());
+            ->where('user_id', optional(auth())->id());
     }
 }
