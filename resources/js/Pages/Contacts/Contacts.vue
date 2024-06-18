@@ -11,6 +11,7 @@ import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 import ContactItem from "./Partials/ContactItem.vue";
 import Filter from "./Partials/Filter.vue";
 import { useToast } from "vue-toastification";
+import { TailwindPagination } from "laravel-vue-pagination";
 
 const props = defineProps({
     contacts: Object,
@@ -137,6 +138,24 @@ const pushContacts = (contact) => {
             contact.longitude
         );
     }
+};
+
+const paginateContacts = async (page = 1) => {
+    const currentUrl = new URL(window.location.href);
+
+    const params = currentUrl.searchParams;
+
+    params.set("page", page);
+
+    router.get(
+        currentUrl.toString(),
+        {},
+        {
+            preserveScroll: false,
+            preserveState: true,
+            only: ["contacts"],
+        }
+    );
 };
 
 const pageTranslations = (name = "", attributes = {}) => {
@@ -298,7 +317,7 @@ onUpdated(() => {
                         v-if="contactsFormatted.length >= 1"
                     >
                         <div
-                            class="col-span-12 lg:col-span-5 pb-2 lg:pr-4 lg:pb-0"
+                            class="col-span-12 lg:col-span-5 pb-2 lg:pr-4 lg:pb-0 overflow-y-auto max-h-screen"
                         >
                             <Filter
                                 :form="filterForm"
@@ -326,6 +345,12 @@ onUpdated(() => {
                         </div>
                     </div>
 
+                    <TailwindPagination
+                        class="mt-5"
+                        :data="contacts"
+                        @pagination-change-page="paginateContacts"
+                    />
+
                     <p v-if="contactsFormatted.length <= 0">
                         {{
                             filterMode
@@ -350,8 +375,7 @@ onUpdated(() => {
 
 <style>
 #map {
-    min-height: 400px;
-    height: 100%;
+    height: 100vh;
     width: 100%;
 }
 </style>

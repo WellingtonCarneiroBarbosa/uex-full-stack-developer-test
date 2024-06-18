@@ -15,4 +15,4 @@
 [X] - Implementar toast notifications
 [X] - Implementar dark mode toggle
 [] - Implementar language selector
-[] - Implementar paginação
+[X] - Implementar paginação

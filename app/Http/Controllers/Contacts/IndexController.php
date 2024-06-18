@@ -38,11 +38,13 @@ class IndexController extends Controller
         ]);
 
         foreach ($params as $key => $param) {
-            match ($key) {
-                'cpf'   => $query->where('cpf', extractDigitsRegex($param)),
-                'name'  => $query->where('name', 'like', "%{$param}%"),
-                default => null
-            };
+            if ($param !== '' && $param !== null) {
+                match ($key) {
+                    'cpf'   => $query->where('cpf', extractDigitsRegex($param)),
+                    'name'  => $query->where('name', 'like', "%{$param}%"),
+                    default => null
+                };
+            }
         }
 
         return $query;
