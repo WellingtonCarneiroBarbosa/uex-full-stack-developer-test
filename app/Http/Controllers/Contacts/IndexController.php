@@ -32,14 +32,14 @@ class IndexController extends Controller
 
     protected function query(Request $request, Builder $query): Builder
     {
-        $params = $request->validateWithBag('filter', [
+        $params = $request->validate([
             'cpf'  => ['nullable', new CPF()],
             'name' => ['nullable'],
         ]);
 
         foreach ($params as $key => $param) {
             match ($key) {
-                'cpf'   => $query->where('cpf', $param),
+                'cpf'   => $query->where('cpf', extractDigitsRegex($param)),
                 'name'  => $query->where('name', 'like', "%{$param}%"),
                 default => null
             };

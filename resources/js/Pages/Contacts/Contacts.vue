@@ -1,9 +1,9 @@
 <script setup>
 import AppLayout from "@/Layouts/AppLayout.vue";
-import { ucfirst } from "@/Helpers/functions";
+import { ucfirst, removeEmptyOrNull } from "@/Helpers/functions";
 import { trans } from "laravel-vue-i18n";
-import { Dot, Plus } from "lucide-vue-next";
-import { computed, onMounted, ref } from "vue";
+import { Dot } from "lucide-vue-next";
+import { computed, onMounted, ref, reactive, onUpdated } from "vue";
 import StringMask from "string-mask";
 import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
@@ -11,10 +11,22 @@ import { useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Dropdown from "@/Components/Dropdown.vue";
 import ConfirmationModal from "@/Components/ConfirmationModal.vue";
+import InputLabel from "@/Components/InputLabel.vue";
+import TextInput from "@/Components/TextInput.vue";
+import InputError from "@/Components/InputError.vue";
+import { vMaska } from "maska";
+import SecondaryButton from "@/Components/SecondaryButton.vue";
 
 const props = defineProps({
     contacts: Object,
 });
+
+const cpfMask = reactive({
+    mask: "###.###.###-##",
+    eager: true,
+});
+
+const filterMode = ref(false);
 
 const formData = useForm({
     name: "",
@@ -168,27 +180,68 @@ const removeMarker = (id, lat, lng) => {
     }
 };
 
-onMounted(() => {
-    let customMap;
+const filterForm = useForm({
+    name: "",
+    cpf: "",
+});
 
-    async function initMap() {
-        const position = { lat: -25.5, lng: -49.163 };
-
-        //@ts-ignore
-        const { Map } = await google.maps.importLibrary("maps");
-        const { AdvancedMarkerElement } = await google.maps.importLibrary(
-            "marker"
-        );
-
-        customMap = new Map(document.getElementById("map"), {
-            zoom: 6,
-            center: position,
-            mapId: "DEMO_MAP_ID",
+const filter = () => {
+    filterForm
+        .transform((data) => {
+            return removeEmptyOrNull(data);
+        })
+        .get(route("dash.contacts.index"), {
+            errorBag: "filter",
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                filterMode.value = true;
+            },
         });
+};
 
-        window.map = customMap;
-    }
+const clearFilters = () => {
+    filterForm.cpf = "";
+    filterForm.name = "";
 
+    router.get(
+        route("dash.contacts.index"),
+        {},
+        {
+            preserveScroll: true,
+            preserveState: true,
+            onSuccess: () => {
+                filterMode.value = false;
+            },
+        }
+    );
+};
+
+let customMap;
+
+async function initMap() {
+    const position = { lat: -25.5, lng: -49.163 };
+
+    //@ts-ignore
+    const { Map } = await google.maps.importLibrary("maps");
+    const { AdvancedMarkerElement } = await google.maps.importLibrary("marker");
+
+    customMap = new Map(document.getElementById("map"), {
+        zoom: 6,
+        center: position,
+        mapId: "DEMO_MAP_ID",
+    });
+
+    window.map = customMap;
+}
+
+initMap();
+
+onMounted(() => {
+    initMap();
+});
+
+onUpdated(() => {
     initMap();
 });
 </script>
@@ -257,9 +310,62 @@ onMounted(() => {
                         v-if="contactsFormatted.length >= 1"
                     >
                         <div
-                            class="col-span-12 lg:col-span-4 pb-2 lg:pr-2 lg:pb-0"
+                            class="col-span-12 lg:col-span-5 pb-2 lg:pr-4 lg:pb-0"
                         >
-                            <div class="flex flex-row w-full">Filters</div>
+                            <div
+                                class="grid grid-cols-12 gap-4 mb-4 border-b lg:border-none pb-3"
+                            >
+                                <div class="col-span-12 lg:col-span-6">
+                                    <InputLabel for="filter-name">{{
+                                        ucfirst(
+                                            $t("validation.attributes.name")
+                                        )
+                                    }}</InputLabel>
+                                    <TextInput
+                                        id="filter-name"
+                                        class="w-full"
+                                        v-model="filterForm.name"
+                                        :disabled="filterForm.processing"
+                                    />
+                                    <InputError
+                                        :message="filterForm.errors.name"
+                                    />
+                                </div>
+
+                                <div class="col-span-12 lg:col-span-6">
+                                    <InputLabel for="filter-cpf">{{
+                                        $t("validation.attributes.cpf")
+                                    }}</InputLabel>
+                                    <TextInput
+                                        id="filter-cpf"
+                                        class="w-full"
+                                        v-model="filterForm.cpf"
+                                        :disabled="filterForm.processing"
+                                        v-maska:[cpfMask]
+                                    />
+                                    <InputError
+                                        :message="filterForm.errors.cpf"
+                                    />
+                                </div>
+
+                                <div class="col-span-6"></div>
+
+                                <div
+                                    class="col-span-6 flex justify-end items-center gap-x-2"
+                                >
+                                    <SecondaryButton
+                                        v-if="filterMode"
+                                        @click="clearFilters"
+                                        >Limpar filtros</SecondaryButton
+                                    >
+                                    <PrimaryButton
+                                        @click="filter"
+                                        :disabled="filterForm.processing"
+                                        class="float-end"
+                                        >Filtrar</PrimaryButton
+                                    >
+                                </div>
+                            </div>
                             <div
                                 class="flex pb-4 overflow-x-auto"
                                 v-for="contact in contactsFormatted"
@@ -347,7 +453,7 @@ onMounted(() => {
                                             <template #content>
                                                 <div class="p-1">
                                                     <button
-                                                        class="w-full rounded-md hover:bg-slate-600 text-start p-1"
+                                                        class="w-full rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-start p-1"
                                                         @click="
                                                             editContact(contact)
                                                         "
@@ -359,7 +465,7 @@ onMounted(() => {
                                                     </button>
 
                                                     <button
-                                                        class="w-full rounded-md hover:bg-slate-600 text-start p-1"
+                                                        class="w-full rounded-md hover:bg-gray-200 dark:hover:bg-slate-600 text-start p-1"
                                                         @click="
                                                             deleteContact(
                                                                 contact
@@ -376,16 +482,27 @@ onMounted(() => {
                             </div>
                         </div>
                         <div
-                            class="col-span-12 lg:col-span-8 border-t pt-2 lg:border-l lg:pl-2 lg:pt-0 lg:border-t-0"
+                            class="col-span-12 lg:col-span-7 border-t pt-2 lg:border-l lg:pl-2 lg:pt-0 lg:border-t-0"
                         >
                             <div id="map"></div>
                         </div>
                     </div>
 
                     <p v-if="contactsFormatted.length <= 0">
-                        Você ainda não possui contatos. Adicione um para
-                        começar.
+                        {{
+                            filterMode
+                                ? "Nenhum contato encontrado."
+                                : "Você ainda não possui contatos. Adicione um para começar."
+                        }}
+
+                        <span
+                            class="cursor-pointer underline"
+                            v-if="filterMode"
+                            @click="clearFilters"
+                            >Limpar filtros</span
+                        >
                     </p>
+
                     <!-- content-->
                 </div>
             </div>
