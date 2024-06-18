@@ -7,9 +7,10 @@ import { computed, onMounted, ref } from "vue";
 import StringMask from "string-mask";
 import Modal from "@/Components/Modal.vue";
 import Form from "./Partials/Form.vue";
-import { useForm } from "@inertiajs/vue3";
+import { useForm, router } from "@inertiajs/vue3";
 import PrimaryButton from "@/Components/PrimaryButton.vue";
 import Dropdown from "@/Components/Dropdown.vue";
+import ConfirmationModal from "@/Components/ConfirmationModal.vue";
 
 const props = defineProps({
     contacts: Object,
@@ -32,6 +33,8 @@ const formData = useForm({
     latitude: "",
     longitude: "",
 });
+
+const showConfirmDeleteDialog = ref(false);
 
 const selectedContact = ref(null);
 
@@ -81,6 +84,33 @@ const editContact = (contact) => {
     selectedContact.value = contact;
     form.value.mode = "edit";
     form.value.show = true;
+};
+
+const deleteContact = (contact) => {
+    selectedContact.value = contact;
+    showConfirmDeleteDialog.value = true;
+};
+
+const deleteContactDismissed = () => {
+    selectedContact.value = null;
+    showConfirmDeleteDialog.value = false;
+};
+
+const confirmContactDeleting = () => {
+    let button = document.getElementById("confirm-contact-delete-button");
+
+    button.attributes.disabled = true;
+    button.innerText = "Deletando...";
+
+    router.delete(
+        route("dash.contacts.delete", { contact: selectedContact.value.id }),
+        {
+            onSuccess: (response) => {
+                showConfirmDeleteDialog.value = false;
+                selectedContact.value = null;
+            },
+        }
+    );
 };
 
 const pushContacts = (contact) => {
@@ -180,6 +210,25 @@ onMounted(() => {
         </div>
     </Modal>
 
+    <ConfirmationModal
+        :show="showConfirmDeleteDialog"
+        @close="deleteContactDismissed"
+    >
+        <template #title>Você tem certeza?</template>
+        <template #content
+            >O contato {{ selectedContact.name }} será permanentemente
+            excluído!</template
+        >
+
+        <template #footer>
+            <PrimaryButton
+                id="confirm-contact-delete-button"
+                @click="confirmContactDeleting"
+                >Deletar</PrimaryButton
+            >
+        </template>
+    </ConfirmationModal>
+
     <AppLayout :title="pageTranslations('title')">
         <template #header>
             <h2
@@ -203,7 +252,10 @@ onMounted(() => {
                 <div
                     class="bg-white dark:bg-gray-800 p-4 overflow-hidden shadow-xl sm:rounded-lg"
                 >
-                    <div class="grid grid-cols-12">
+                    <div
+                        class="grid grid-cols-12"
+                        v-if="contactsFormatted.length >= 1"
+                    >
                         <div
                             class="col-span-12 lg:col-span-4 pb-2 lg:pr-2 lg:pb-0"
                         >
@@ -305,6 +357,17 @@ onMounted(() => {
                                                         }}
                                                         / {{ $t("words.edit") }}
                                                     </button>
+
+                                                    <button
+                                                        class="w-full rounded-md hover:bg-slate-600 text-start p-1"
+                                                        @click="
+                                                            deleteContact(
+                                                                contact
+                                                            )
+                                                        "
+                                                    >
+                                                        {{ $t("words.delete") }}
+                                                    </button>
                                                 </div>
                                             </template>
                                         </Dropdown>
@@ -318,6 +381,11 @@ onMounted(() => {
                             <div id="map"></div>
                         </div>
                     </div>
+
+                    <p v-if="contactsFormatted.length <= 0">
+                        Você ainda não possui contatos. Adicione um para
+                        começar.
+                    </p>
                     <!-- content-->
                 </div>
             </div>
